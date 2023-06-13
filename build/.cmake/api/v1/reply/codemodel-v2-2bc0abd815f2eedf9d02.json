@@ -1,0 +1,728 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1,
+						2,
+						6
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Debug-f0100f3c7248faaa1af4.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.23.0"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						4
+					]
+				},
+				{
+					"build" : "depends",
+					"jsonFile" : "directory-depends-Debug-ab8c8844fbd9a0853d6f.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.23.0"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "depends"
+				},
+				{
+					"build" : "src",
+					"childIndexes" : 
+					[
+						3,
+						4,
+						5
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-src-Debug-b6cf2213fc5053b67c22.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.23.0"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "src"
+				},
+				{
+					"build" : "src/gmatutil",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-src.gmatutil-Debug-8430dd8996643cbfa5ba.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.23.0"
+					},
+					"parentIndex" : 2,
+					"projectIndex" : 0,
+					"source" : "src/gmatutil",
+					"targetIndexes" : 
+					[
+						3
+					]
+				},
+				{
+					"build" : "src/csalt",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-src.csalt-Debug-18db8d5f563901ace2ca.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.23.0"
+					},
+					"parentIndex" : 2,
+					"projectIndex" : 0,
+					"source" : "src/csalt",
+					"targetIndexes" : 
+					[
+						1
+					]
+				},
+				{
+					"build" : "src/csaltTester",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-src.csaltTester-Debug-6c8017978f8baae27ad7.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.23.0"
+					},
+					"parentIndex" : 2,
+					"projectIndex" : 0,
+					"source" : "src/csaltTester",
+					"targetIndexes" : 
+					[
+						2
+					]
+				},
+				{
+					"build" : "build/install",
+					"jsonFile" : "directory-build.install-Debug-6ab96406f8d0210d6a1b.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.23.0"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "build/install"
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6
+					],
+					"name" : "GMAT",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "ALL_BUILD::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-ALL_BUILD-Debug-a839beebf6ad489fc406.json",
+					"name" : "ALL_BUILD",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 4,
+					"id" : "CSALT::@accf912502fbc4678712",
+					"jsonFile" : "target-CSALT-Debug-5cf23f0f81091bc89ea1.json",
+					"name" : "CSALT",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 5,
+					"id" : "CSALTTester::@3d24a99e4c64fd67a9a5",
+					"jsonFile" : "target-CSALTTester-Debug-bd673a231bcfd1b58ae3.json",
+					"name" : "CSALTTester",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 3,
+					"id" : "GmatUtil::@58d964aad52084b3f2a5",
+					"jsonFile" : "target-GmatUtil-Debug-701e60dabe73c3a73aed.json",
+					"name" : "GmatUtil",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "ZERO_CHECK::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-ZERO_CHECK-Debug-a5d02d478828279fa76a.json",
+					"name" : "ZERO_CHECK",
+					"projectIndex" : 0
+				}
+			]
+		},
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1,
+						2,
+						6
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Release-04c694715a5e6287e5f9.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.23.0"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						4
+					]
+				},
+				{
+					"build" : "depends",
+					"jsonFile" : "directory-depends-Release-ab8c8844fbd9a0853d6f.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.23.0"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "depends"
+				},
+				{
+					"build" : "src",
+					"childIndexes" : 
+					[
+						3,
+						4,
+						5
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-src-Release-b6cf2213fc5053b67c22.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.23.0"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "src"
+				},
+				{
+					"build" : "src/gmatutil",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-src.gmatutil-Release-05918cb99adbf3ac6512.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.23.0"
+					},
+					"parentIndex" : 2,
+					"projectIndex" : 0,
+					"source" : "src/gmatutil",
+					"targetIndexes" : 
+					[
+						3
+					]
+				},
+				{
+					"build" : "src/csalt",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-src.csalt-Release-cefc90daee10cabbed9c.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.23.0"
+					},
+					"parentIndex" : 2,
+					"projectIndex" : 0,
+					"source" : "src/csalt",
+					"targetIndexes" : 
+					[
+						1
+					]
+				},
+				{
+					"build" : "src/csaltTester",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-src.csaltTester-Release-94e2b8313288cc7c86c2.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.23.0"
+					},
+					"parentIndex" : 2,
+					"projectIndex" : 0,
+					"source" : "src/csaltTester",
+					"targetIndexes" : 
+					[
+						2
+					]
+				},
+				{
+					"build" : "build/install",
+					"jsonFile" : "directory-build.install-Release-6ab96406f8d0210d6a1b.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.23.0"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "build/install"
+				}
+			],
+			"name" : "Release",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6
+					],
+					"name" : "GMAT",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "ALL_BUILD::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-ALL_BUILD-Release-a839beebf6ad489fc406.json",
+					"name" : "ALL_BUILD",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 4,
+					"id" : "CSALT::@accf912502fbc4678712",
+					"jsonFile" : "target-CSALT-Release-ff6bf7cbfd3d55d01d86.json",
+					"name" : "CSALT",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 5,
+					"id" : "CSALTTester::@3d24a99e4c64fd67a9a5",
+					"jsonFile" : "target-CSALTTester-Release-e685fcc799df85447c08.json",
+					"name" : "CSALTTester",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 3,
+					"id" : "GmatUtil::@58d964aad52084b3f2a5",
+					"jsonFile" : "target-GmatUtil-Release-4411e7e349b34b81483b.json",
+					"name" : "GmatUtil",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "ZERO_CHECK::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-ZERO_CHECK-Release-a5d02d478828279fa76a.json",
+					"name" : "ZERO_CHECK",
+					"projectIndex" : 0
+				}
+			]
+		},
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1,
+						2,
+						6
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-MinSizeRel-04c694715a5e6287e5f9.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.23.0"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						4
+					]
+				},
+				{
+					"build" : "depends",
+					"jsonFile" : "directory-depends-MinSizeRel-ab8c8844fbd9a0853d6f.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.23.0"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "depends"
+				},
+				{
+					"build" : "src",
+					"childIndexes" : 
+					[
+						3,
+						4,
+						5
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-src-MinSizeRel-b6cf2213fc5053b67c22.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.23.0"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "src"
+				},
+				{
+					"build" : "src/gmatutil",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-src.gmatutil-MinSizeRel-5ffe53b6cf27d0037b49.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.23.0"
+					},
+					"parentIndex" : 2,
+					"projectIndex" : 0,
+					"source" : "src/gmatutil",
+					"targetIndexes" : 
+					[
+						3
+					]
+				},
+				{
+					"build" : "src/csalt",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-src.csalt-MinSizeRel-bc77c29a15899d239092.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.23.0"
+					},
+					"parentIndex" : 2,
+					"projectIndex" : 0,
+					"source" : "src/csalt",
+					"targetIndexes" : 
+					[
+						1
+					]
+				},
+				{
+					"build" : "src/csaltTester",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-src.csaltTester-MinSizeRel-e48682666c748da18832.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.23.0"
+					},
+					"parentIndex" : 2,
+					"projectIndex" : 0,
+					"source" : "src/csaltTester",
+					"targetIndexes" : 
+					[
+						2
+					]
+				},
+				{
+					"build" : "build/install",
+					"jsonFile" : "directory-build.install-MinSizeRel-6ab96406f8d0210d6a1b.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.23.0"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "build/install"
+				}
+			],
+			"name" : "MinSizeRel",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6
+					],
+					"name" : "GMAT",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "ALL_BUILD::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-ALL_BUILD-MinSizeRel-a839beebf6ad489fc406.json",
+					"name" : "ALL_BUILD",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 4,
+					"id" : "CSALT::@accf912502fbc4678712",
+					"jsonFile" : "target-CSALT-MinSizeRel-103223aad363cfb1a9a7.json",
+					"name" : "CSALT",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 5,
+					"id" : "CSALTTester::@3d24a99e4c64fd67a9a5",
+					"jsonFile" : "target-CSALTTester-MinSizeRel-9df09b92420e64b3cf45.json",
+					"name" : "CSALTTester",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 3,
+					"id" : "GmatUtil::@58d964aad52084b3f2a5",
+					"jsonFile" : "target-GmatUtil-MinSizeRel-f904f4f664e4b4d11d9c.json",
+					"name" : "GmatUtil",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "ZERO_CHECK::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-ZERO_CHECK-MinSizeRel-a5d02d478828279fa76a.json",
+					"name" : "ZERO_CHECK",
+					"projectIndex" : 0
+				}
+			]
+		},
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1,
+						2,
+						6
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-RelWithDebInfo-04c694715a5e6287e5f9.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.23.0"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						4
+					]
+				},
+				{
+					"build" : "depends",
+					"jsonFile" : "directory-depends-RelWithDebInfo-ab8c8844fbd9a0853d6f.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.23.0"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "depends"
+				},
+				{
+					"build" : "src",
+					"childIndexes" : 
+					[
+						3,
+						4,
+						5
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-src-RelWithDebInfo-b6cf2213fc5053b67c22.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.23.0"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "src"
+				},
+				{
+					"build" : "src/gmatutil",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-src.gmatutil-RelWithDebInfo-1d7b24ed9bc7e23d8cd3.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.23.0"
+					},
+					"parentIndex" : 2,
+					"projectIndex" : 0,
+					"source" : "src/gmatutil",
+					"targetIndexes" : 
+					[
+						3
+					]
+				},
+				{
+					"build" : "src/csalt",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-src.csalt-RelWithDebInfo-3e6e6ee0b4e126037918.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.23.0"
+					},
+					"parentIndex" : 2,
+					"projectIndex" : 0,
+					"source" : "src/csalt",
+					"targetIndexes" : 
+					[
+						1
+					]
+				},
+				{
+					"build" : "src/csaltTester",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-src.csaltTester-RelWithDebInfo-30e309dad90a1300fe36.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.23.0"
+					},
+					"parentIndex" : 2,
+					"projectIndex" : 0,
+					"source" : "src/csaltTester",
+					"targetIndexes" : 
+					[
+						2
+					]
+				},
+				{
+					"build" : "build/install",
+					"jsonFile" : "directory-build.install-RelWithDebInfo-6ab96406f8d0210d6a1b.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.23.0"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "build/install"
+				}
+			],
+			"name" : "RelWithDebInfo",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6
+					],
+					"name" : "GMAT",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "ALL_BUILD::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-ALL_BUILD-RelWithDebInfo-a839beebf6ad489fc406.json",
+					"name" : "ALL_BUILD",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 4,
+					"id" : "CSALT::@accf912502fbc4678712",
+					"jsonFile" : "target-CSALT-RelWithDebInfo-bea34ab0e017138e4f27.json",
+					"name" : "CSALT",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 5,
+					"id" : "CSALTTester::@3d24a99e4c64fd67a9a5",
+					"jsonFile" : "target-CSALTTester-RelWithDebInfo-45af6411b94a9e6ba530.json",
+					"name" : "CSALTTester",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 3,
+					"id" : "GmatUtil::@58d964aad52084b3f2a5",
+					"jsonFile" : "target-GmatUtil-RelWithDebInfo-d83687c10c35cb6ce02e.json",
+					"name" : "GmatUtil",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "ZERO_CHECK::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-ZERO_CHECK-RelWithDebInfo-a5d02d478828279fa76a.json",
+					"name" : "ZERO_CHECK",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/Users/granthec/Source/CSALT/build",
+		"source" : "/Users/granthec/Source/CSALT"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 4
+	}
+}

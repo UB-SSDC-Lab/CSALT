@@ -1,0 +1,13 @@
+
+ SNMEMA EXIT 100 -- finished successfully
+ SNMEMA INFO 104 -- memory requirements estimated
+
+ XXX  User workspace parameters had to be modified
+
+ XXX  Invalid arguments xlow, xupp:     24 inconsistent bounds or infinite equal bounds.
+
+ XXX  Invalid arguments Flow, Fupp:     37 inconsistent bounds or infinite equal bounds.
+ and so on ...
+
+ SNOPTA EXIT  90 -- input arguments out of range
+ SNOPTA INFO  91 -- invalid input argument

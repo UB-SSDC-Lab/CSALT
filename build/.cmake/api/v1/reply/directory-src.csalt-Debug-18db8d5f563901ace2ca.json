@@ -1,0 +1,78 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"INSTALL"
+		],
+		"files" : 
+		[
+			"src/csalt/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 165,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 184,
+				"parent" : 0
+			}
+		]
+	},
+	"installers" : 
+	[
+		{
+			"backtrace" : 1,
+			"component" : "Unspecified",
+			"destination" : "bin/GMATd-R2022a_Beta.app/Contents/Frameworks",
+			"paths" : 
+			[
+				"/Users/granthec/Source/CSALT/application/debug/libCSALTd.R2022a.dylib"
+			],
+			"targetId" : "CSALT::@accf912502fbc4678712",
+			"targetIndex" : 1,
+			"targetInstallNamelink" : "skip",
+			"type" : "target"
+		},
+		{
+			"backtrace" : 1,
+			"component" : "Unspecified",
+			"destination" : "bin/GMATd-R2022a_Beta.app/Contents/Frameworks",
+			"paths" : 
+			[
+				"/Users/granthec/Source/CSALT/application/debug/libCSALTd.dylib"
+			],
+			"targetId" : "CSALT::@accf912502fbc4678712",
+			"targetIndex" : 1,
+			"targetInstallNamelink" : "only",
+			"type" : "target"
+		},
+		{
+			"backtrace" : 2,
+			"component" : "Unspecified",
+			"destination" : "bin/GMATd-R2022a_Beta.app/Contents/Frameworks",
+			"paths" : 
+			[
+				{
+					"from" : "depends/snopt7/lib",
+					"to" : "."
+				}
+			],
+			"type" : "directory"
+		}
+	],
+	"paths" : 
+	{
+		"build" : "src/csalt",
+		"source" : "src/csalt"
+	}
+}
