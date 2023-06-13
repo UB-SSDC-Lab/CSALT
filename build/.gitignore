@@ -6,14 +6,12 @@
 /CMakeFiles
 !/CMakeFiles/cmake.check_cache
 !/CMakeFiles/pkgRedirects
-!/install/CMake_INSTALL_Setup.cmake
 /Debug
 /depends
 /EagerLinkingTBDs
 /windows-cmakebuild/
 /GMAT.build
 /GMAT.xcodeproj 
-/install
 *.ninja_deps
 *.ninja_log
 build.ninja
