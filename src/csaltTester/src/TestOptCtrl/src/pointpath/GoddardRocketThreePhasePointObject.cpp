@@ -79,9 +79,9 @@ void GoddardRocketThreePhasePointObject::EvaluateFunctions()
 //   Real g = 32.174;
 //   Real dg_dh = 0.0;
 
-   SetStatePerturbation(1e-2);
-   SetTimePerturbation(1e-2);
-   SetControlPerturbation(1e-2);
+   //SetStatePerturbation(1e-2);
+   //SetTimePerturbation(1e-2);
+   //SetControlPerturbation(1e-2);
 
    Rvector stateVec1i = GetInitialStateVector(0);
    Rvector stateVec1f = GetFinalStateVector(0);

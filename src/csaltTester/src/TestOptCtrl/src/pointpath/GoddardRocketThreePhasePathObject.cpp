@@ -90,9 +90,9 @@ void GoddardRocketThreePhasePathObject::EvaluateFunctions()
    Real g = 32.174;
 //   Real dg_dh = 0.0;             // Uniform gravity case
 
-   SetStatePerturbation(1e-2);
-   SetTimePerturbation(1e-2);
-   SetControlPerturbation(1e-2);
+   //SetStatePerturbation(1e-2);
+   //SetTimePerturbation(1e-2);
+   //SetControlPerturbation(1e-2);
    // Extract parameter data
    Rvector stateVec = GetStateVector();
    Rvector controlVec = GetControlVector();

@@ -61,7 +61,7 @@ void GoddardRocketThreePhaseDriver::SetPointPathAndProperties()
 
 void GoddardRocketThreePhaseDriver::SetupPhases()
 {
-   bool useRadau = false;
+   bool useRadau = true;
 
    //PHASE 1
    MessageInterface::ShowMessage("*** Creating the first phase\n");

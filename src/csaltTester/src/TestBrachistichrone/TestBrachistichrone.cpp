@@ -14,7 +14,7 @@
 #include <iostream>
 #include <string>
 #include <ctime>
-#include "gmatdefs.hpp"
+#include "csaltdefs.hpp"
 #include "GmatConstants.hpp"
 #include "Linear.hpp"
 #include "Rvector.hpp"
@@ -23,7 +23,7 @@
 #include "Rmatrix33.hpp"
 //#include "TestOutput.hpp"
 #include "MessageInterface.hpp"
-#include "ConsoleMessageReceiver.hpp"
+//#include "ConsoleMessageReceiver.hpp"
 #include "FileManager.hpp"
 #include "TimeTypes.hpp"
 #include "FunctionOutputData.hpp"
@@ -73,8 +73,8 @@ int main(int argc, char *argv[])
    std::string outFormat = "%16.9f ";
    Real        tolerance = 1e-15;
    
-   ConsoleMessageReceiver *consoleMsg = ConsoleMessageReceiver::Instance();
-   MessageInterface::SetMessageReceiver(consoleMsg);
+   //ConsoleMessageReceiver *consoleMsg = ConsoleMessageReceiver::Instance();
+   //MessageInterface::SetMessageReceiver(consoleMsg);
    std::string outPath = "./";
    MessageInterface::SetLogFile(outPath + "GmatLog.txt");
    MessageInterface::ShowMessage("%s\n",
@@ -243,8 +243,9 @@ int main(int argc, char *argv[])
       Rvector F(C.GetSize());
       Rvector xmul(dv2.GetSize());
       Rvector Fmul(C.GetSize());
+      Integer flag;
       MessageInterface::ShowMessage("*** TEST *** Optimizing!!\n");
-      traj->Optimize(z, F, xmul, Fmul);
+      traj->Optimize(z, F, xmul, Fmul, flag);
 
       MessageInterface::ShowMessage("*** TEST *** z:\n%s\n",
                                     z.ToString(12).c_str());

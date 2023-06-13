@@ -4,10 +4,11 @@
 
 
 # Define macros for locations
-BASE_ROOT = ../..
-TEST_ROOT = ..
-BOOST_ROOT = /usr/local/include/boost
-SNOPT_ROOT = /Users/jknittel/Utilities/SNOPT/SNOPT75_1_8_2016/
+BASE_ROOT = /Users/granthec/Source/CSALT/src/csalt
+TEST_ROOT = /Users/granthec/Source/CSALT/src/csaltTester
+GMAT_Utilities = /Users/granthec/Source/CSALT/src/gmatutil
+BOOST_ROOT = /Users/granthec/Source/CSALT/depends/Boost_1_71_0
+SNOPT_ROOT = /Users/granthec/Source/CSALT/depends/snopt7
 BINDIR = $(TEST_ROOT)/bin
 EXECUTABLE = $(BINDIR)/TestBrachistichrone
 
@@ -19,34 +20,35 @@ OPTIMIZATIONS =
 
 # Define macros for the needed includes
 HEADERS =   -I. \
-            -I$(BASE_ROOT)/test/TestBrachistichrone \
-            -I$(BASE_ROOT)/test/HelperClasses \
+            -I$(TEST_ROOT)/src/TestBrachistichrone \
+            -I$(TEST_ROOT)/src/HelperClasses \
             -I$(BASE_ROOT)/src/userfunutils \
             -I$(BASE_ROOT)/src/collutils \
             -I$(BASE_ROOT)/src/executive \
             -I$(BASE_ROOT)/src/util \
-            -I$(BASE_ROOT)/GMAT_Utilities/include \
-            -I$(BASE_ROOT)/GMAT_Utilities/util \
-            -I$(BASE_ROOT)/GMAT_Utilities/console \
+            -I$(BASE_ROOT)/src/include \
+            -I$(GMAT_Utilities)/include \
+            -I$(GMAT_Utilities)/util \
+            -I$(GMAT_Utilities)/util/datawriter \
+            -I$(GMAT_Utilities)/util/interpolator \
+            -I$(GMAT_Utilities)/util/matrixoperations \
             -I$(BOOST_ROOT) \
-			-I$(SNOPT_ROOT)/interfaces \
-			-I$(SNOPT_ROOT)/interfaces/include \
-			-I$(SNOPT_ROOT)/interfaces/src \
+            -I$(SNOPT_ROOT)/include \
+            -I$(SNOPT_ROOT)/src \
             
 DRIVER = TestBrachistichrone.o
             
 OBJECTS = \
-    $(BASE_ROOT)/test/HelperClasses/BrachistichronePathObject.o \
-    $(BASE_ROOT)/test/HelperClasses/BrachistichronePointObject.o \
+    $(TEST_ROOT)/src/HelperClasses/BrachistichronePathObject.o \
+    $(TEST_ROOT)/src/HelperClasses/BrachistichronePointObject.o \
     $(BASE_ROOT)/src/util/LowThrustException.o \
     $(BASE_ROOT)/src/util/RadauMathUtil.o \
-    $(BASE_ROOT)/src/util/BarycentricLagrangeInterpolator.o \
+    $(BASE_ROOT)/src/util/BaryLagrangeInterpolator.o \
     $(BASE_ROOT)/src/util/SparseMatrixUtil.o \
-	 $(BASE_ROOT)/src/util/SNOPTFunctionWrapper.o \
-    $(BASE_ROOT)/src/executive/GuessGenerator.o \
+	$(BASE_ROOT)/src/util/SNOPTFunctionWrapper.o \
     $(BASE_ROOT)/src/executive/Phase.o \
     $(BASE_ROOT)/src/executive/RadauPhase.o \
-    $(BASE_ROOT)/src/executive/Optimizer.o \
+    $(BASE_ROOT)/src/executive/OptimizerBase.o \
     $(BASE_ROOT)/src/executive/Trajectory.o \
     $(BASE_ROOT)/src/collutils/DecisionVector.o \
     $(BASE_ROOT)/src/collutils/DecVecTypeBetts.o \
@@ -59,8 +61,6 @@ OBJECTS = \
     $(BASE_ROOT)/src/collutils/NLPFunctionData.o \
     $(BASE_ROOT)/src/collutils/ProblemCharacteristics.o \
     $(BASE_ROOT)/src/userfunutils/BoundData.o \
-    $(BASE_ROOT)/src/userfunutils/DummyPathFunction.o \
-    $(BASE_ROOT)/src/userfunutils/DummyPathFunction2.o \
     $(BASE_ROOT)/src/userfunutils/JacobianData.o \
     $(BASE_ROOT)/src/userfunutils/UserFunction.o \
     $(BASE_ROOT)/src/userfunutils/UserFunctionManager.o \
@@ -74,32 +74,30 @@ OBJECTS = \
     $(BASE_ROOT)/src/userfunutils/FunctionContainer.o \
     $(BASE_ROOT)/src/userfunutils/PathFunctionContainer.o \
     $(BASE_ROOT)/src/userfunutils/PointFunctionContainer.o \
-    $(BASE_ROOT)/GMAT_Utilities/console/ConsoleMessageReceiver.o \
-    $(BASE_ROOT)/GMAT_Utilities/util/BaseException.o \
-    $(BASE_ROOT)/GMAT_Utilities/util/FileManager.o \
-    $(BASE_ROOT)/GMAT_Utilities/util/FileUtil.o \
-    $(BASE_ROOT)/GMAT_Utilities/util/GmatGlobal.o \
-    $(BASE_ROOT)/GMAT_Utilities/util/Linear.o \
-    $(BASE_ROOT)/GMAT_Utilities/util/MessageInterface.o \
-    $(BASE_ROOT)/GMAT_Utilities/util/MessageReceiver.o \
-    $(BASE_ROOT)/GMAT_Utilities/util/RandomNumber.o \
-    $(BASE_ROOT)/GMAT_Utilities/util/RealUtilities.o \
-    $(BASE_ROOT)/GMAT_Utilities/util/Rmatrix.o \
-    $(BASE_ROOT)/GMAT_Utilities/util/Rmatrix33.o \
-    $(BASE_ROOT)/GMAT_Utilities/util/Rvector.o \
-    $(BASE_ROOT)/GMAT_Utilities/util/Rvector3.o \
-    $(BASE_ROOT)/GMAT_Utilities/util/StringTokenizer.o \
-    $(BASE_ROOT)/GMAT_Utilities/util/StringUtil.o \
-    $(BASE_ROOT)/GMAT_Utilities/util/TimeTypes.o
+    $(GMAT_Utilities)/util/BaseException.o \
+    $(GMAT_Utilities)/util/FileManager.o \
+    $(GMAT_Utilities)/util/FileUtil.o \
+    $(GMAT_Utilities)/util/GmatGlobal.o \
+    $(GMAT_Utilities)/util/Linear.o \
+    $(GMAT_Utilities)/util/MessageInterface.o \
+    $(GMAT_Utilities)/util/MessageReceiver.o \
+    $(GMAT_Utilities)/util/RandomNumber.o \
+    $(GMAT_Utilities)/util/RealUtilities.o \
+    $(GMAT_Utilities)/util/Rmatrix.o \
+    $(GMAT_Utilities)/util/Rmatrix33.o \
+    $(GMAT_Utilities)/util/Rvector.o \
+    $(GMAT_Utilities)/util/Rvector3.o \
+    $(GMAT_Utilities)/util/StringTokenizer.o \
+    $(GMAT_Utilities)/util/StringUtil.o \
+    $(GMAT_Utilities)/util/TimeTypes.o
 
 ###    $(BASE_ROOT)/src/userfunutils/DummyPathFunction.o \
 
-CPPFLAGS = $(HEADERS) $(OPTIMIZATIONS) $(TESTFLAGS) -Wall
+CPPFLAGS = $(HEADERS) $(OPTIMIZATIONS) $(TESTFLAGS) -Wall -std=c++17
 CPP = g++
 
 # Link specific flags
-LINK_FLAGS =  /usr/lib/libstdc++.6.dylib \
-               -headerpad_max_install_names \
+LINK_FLAGS =  -headerpad_max_install_names \
                -lm -v \
 			   -L$(SNOPT_ROOT)/lib/.libs/ \
 			   -lsnopt7_cpp \
@@ -115,7 +113,6 @@ $(OBJECTS): %.o: %.cpp %.hpp
 #
 # Default suffix rule
 .SUFFIXES: .o .cpp
-
 
 # Target definitions
 #
