@@ -6,6 +6,7 @@
 /CMakeFiles
 !/CMakeFiles/cmake.check_cache
 !/CMakeFiles/pkgRedirects
+!/install/CMake_INSTALL_Setup.cmake
 /Debug
 /depends
 /EagerLinkingTBDs
