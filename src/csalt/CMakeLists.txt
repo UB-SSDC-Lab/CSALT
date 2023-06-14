@@ -68,7 +68,6 @@ SET(CSALT_SRCS
     src/util/ScalingUtility.cpp
     src/util/GuessGenerator.cpp
     src/util/ArrayTrajectoryData.cpp
-
     src/util/OCHTrajectoryData.cpp
     src/util/TrajectorySegment.cpp
     src/util/DummyPathFunction.cpp
@@ -76,7 +75,6 @@ SET(CSALT_SRCS
     src/util/OCHTrajectorySegment.cpp
     src/util/DummyPathFunction2.cpp
     src/util/ModEqDynamics.cpp
-
     src/executive/ExecutionInterface.cpp
     src/executive/ImplicitRKPhase.cpp
     src/executive/RadauPhase.cpp
@@ -100,7 +98,6 @@ SET(CSALT_SRCS
     src/userfunutils/UserPointFunction.cpp
     src/userfunutils/OrbitPointFunction.cpp
     src/userfunutils/FunctionContainer.cpp
-
     src/userfunutils/UserPathFunction.cpp
     src/userfunutils/OrbitPathFunction.cpp
     src/userfunutils/UserFunction.cpp

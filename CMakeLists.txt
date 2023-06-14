@@ -19,7 +19,8 @@
 #
 
 # Require CMake minimum version
-CMAKE_MINIMUM_REQUIRED(VERSION 3.23.0)
+cmake_minimum_required(VERSION 3.14.0)
+CMAKE_POLICY(VERSION 3.14)
 
 # Require OSX minimum version
 IF(APPLE)
@@ -135,6 +136,16 @@ if (GMAT_USE_BOOST_VARIANT OR GMAT_INCLUDE_CSALT)
    endif()
 else()
    SET(GMAT_USE_BOOST OFF)
+endif()
+
+# Additional libraries needed to use on Mac/Linux
+if(UNIX)
+  if(APPLE)
+    FIND_LIBRARY(COREFOUNDATION_LIBRARY CoreFoundation)
+    FIND_LIBRARY(CORESERVICES_LIBRARY CoreServices)
+  else()
+    FIND_PACKAGE(Threads)
+  endif()
 endif()
 
 # ====================================================================

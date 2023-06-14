@@ -1,0 +1,4 @@
+GMAT Build Date: Jun 14 2023 13:59:13
+
+GMAT Log file set to ./CsaltLog.txt
+The log file mode is create
