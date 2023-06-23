@@ -17,6 +17,7 @@
 #include "SnoptOptimizer.hpp"
 #include "Trajectory.hpp"
 #include "MessageInterface.hpp"
+#include <iostream>
 
 //#define DEBUG_BOUNDS
 //#define DEBUG_TRAJECTORY
@@ -27,6 +28,8 @@
 //#define DEBUG_DECONSTRUCT
 //#define DEBUG_PHASE_DATA   // reporting phase data (constraints, etc.)
 //#define DEBUG_REPORT_DATA  // reporting Bound Data//#define DEBUG_HESSIAN // YK mod IPOPT branch
+//#define DEBUG_ALL_CONSTRAINTS
+//#define DEBUG_MAX_CONSTRAINT_VIOLATION
 
 //------------------------------------------------------------------------------
 // static data
@@ -1741,6 +1744,11 @@ void Trajectory::ComputeMaxConstraintViolation(Real &maxConViol,
    Rvector conVec = GetCostConstraintFunctions();
    RealArray testConVec = conVec.GetRealArray();
 
+#if defined(DEBUG_ALL_CONSTRAINTS) || defined(DEBUG_MAX_CONSTRAINT_VIOLATION)
+   StringArray conVecNames = GetConstraintVectorNames();
+   Integer maxConIdx = -1;
+#endif
+
    maxConViol = 0.0;
    for (Integer i = 0; i < allConLowerBound.size(); ++i)
    {
@@ -1750,9 +1758,22 @@ void Trajectory::ComputeMaxConstraintViolation(Real &maxConViol,
       else if (conVec(i + 1) > allConUpperBound.at(i))
          conViol = conVec(i + 1) - allConUpperBound.at(i);
 
-      if (conViol > maxConViol)
-         maxConViol = conViol;
+#ifdef DEBUG_ALL_CONSTRAINTS
+   std::cout << i << " " << conVecNames.at(i) << ": " << conViol << std::endl;
+#endif
+
+      if (conViol > maxConViol) {
+         maxConViol  = conViol;
+
+#ifdef DEBUG_MAX_CONSTRAINT_VIOLATION
+         maxConIdx   = i;
+#endif
+      }
    }
+
+#ifdef DEBUG_MAX_CONSTRAINT_VIOLATION
+   std::cout << conVecNames.at(maxConIdx) << ": " << maxConViol << std::endl;
+#endif
 }
 
 //------------------------------------------------------------------------------

@@ -63,6 +63,7 @@
 #include "drivers/CatalyticGasOilCrackerDriver.hpp"
 #include "drivers/HohmannTransferDriver.hpp"
 #include "drivers/TutorialDriver.hpp"
+#include "drivers/DebrisDeorbitDriver.hpp"
 
 // Component test cases
 #include "DecisionVectorDriver.hpp"

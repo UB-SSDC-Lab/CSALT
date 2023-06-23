@@ -30,6 +30,7 @@
 
 #include "CsaltTestDriver.hpp"
 #include "BaseException.hpp"
+#include <iostream>
 
 //#define DEBUG_SHOWRESULTS
 const Real CsaltTestDriver::INF = std::numeric_limits<Real>::infinity();
@@ -192,7 +193,7 @@ Integer CsaltTestDriver::Run()
       traj->SetCostLowerBound(costLowerBound);
       traj->SetCostUpperBound(costUpperBound);
       traj->SetMaxMeshRefinementCount(maxMeshRefinementCount);
-      traj->SetFailedMeshOptimizationAllowance(false);
+      traj->SetFailedMeshOptimizationAllowance(true);
       traj->SetMeshRefinementGuessMode("LastSolutionMostRecentMesh");
 	  traj->SetSnoptConsoleOutputLevel(this->snoptConsoleOutputLevel);
    

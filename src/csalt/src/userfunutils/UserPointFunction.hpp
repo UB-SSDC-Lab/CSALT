@@ -63,7 +63,7 @@ public:
                    GetAlgFunctionNames();
    virtual const std::vector<OptimalControlFunction*>& GetOptControlFunctionObjects();
    
-   DEPRECATED(virtual void SetAlgFunctions(const Rvector &toValues));
+   DEPRECATED(virtual void    SetAlgFunctions(const Rvector &toValues));
    DEPRECATED(virtual void    SetAlgUpperBounds(const Rvector &toValues));
    DEPRECATED(virtual void    SetAlgLowerBounds(const Rvector &toValues));
    DEPRECATED(virtual void    SetAlgFunctionNames(const StringArray& toNames));

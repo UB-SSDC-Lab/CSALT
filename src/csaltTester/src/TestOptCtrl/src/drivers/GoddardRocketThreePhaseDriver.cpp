@@ -141,7 +141,7 @@ void GoddardRocketThreePhaseDriver::SetupPhases()
    //gpops
    Integer numControlVars = 1;
    Rvector controlUpperBound(1,193.044);
-   Rvector controlLowerBound(1,193.044);
+   Rvector controlLowerBound(1,0.0);
 
    phase1->SetInitialGuessMode(initialGuessMode);
    phase1->SetNumStateVars(numStateVars);

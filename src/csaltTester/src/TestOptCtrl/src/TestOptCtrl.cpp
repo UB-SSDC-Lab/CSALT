@@ -45,11 +45,6 @@
 #include <chrono>
 #include "StateConversionUtil.hpp"
 
-//#define AUTONGC_TEST_CASE
-#ifdef AUTONGC_TEST_CASE
-   #include "AutoNGCDriver.hpp"
-#endif
-
 /**
  * Test case driver program for CSALT test cases
  */
@@ -114,7 +109,8 @@ int main(int argc, char *argv[])
 					CatalyticGasOilCrackerDriver         *driver19 = new CatalyticGasOilCrackerDriver();
 					LinearTangentSteeringStaticVarDriver *driver20 = new LinearTangentSteeringStaticVarDriver();
 					HohmannTransferDriver                *driver21 = new HohmannTransferDriver();
-					TutorialDriver *driver22 = new TutorialDriver;
+					TutorialDriver                       *driver22 = new TutorialDriver;
+					DebrisDeorbitDriver 			     *driver23 = new DebrisDeorbitDriver();
 
 					driver1->Run();
 					driver101->Run();
@@ -141,6 +137,7 @@ int main(int argc, char *argv[])
 					driver20->Run();
 					driver21->Run();
 					driver22->Run();
+					driver23->Run();
 
 					delete driver1;
 					delete driver101;
@@ -167,6 +164,7 @@ int main(int argc, char *argv[])
 					delete driver20;
 					delete driver21;
 					delete driver22;
+					delete driver23;
 
 					Real duration = (std::clock() - starttime) / (double)CLOCKS_PER_SEC;
 					std::cout << "Total run time: " << duration << " sec\n\n";
@@ -223,6 +221,8 @@ int main(int argc, char *argv[])
 						HohmannTransferDriver *driver = new HohmannTransferDriver();
 					else if (test == "Tutorial")
 						TutorialDriver *driver = new TutorialDriver();
+					else if (test == "DebrisDeorbit")
+						DebrisDeorbitDriver *driver = new DebrisDeorbitDriver();
 					else
 					{
 						std::cout << "Error: Invalid test entered for -run command."
@@ -287,6 +287,7 @@ int main(int argc, char *argv[])
 				msg += "   LinearTangentSteeringStaticVar\n";
 				msg += "   HohmannTransfer\n";
 				msg += "   Tutorial\n";
+				msg += "   DebrisDeorbit\n";
 				msg += "\n";
 
 				msg += "-exit: Exits after the prior arguments are \n";
@@ -335,19 +336,16 @@ int main(int argc, char *argv[])
 	msg += "20. LinearTangentSteeringStaticVarDriver\n";
 	msg += "21. HohmannTransferDriver\n";
 	msg += "22. Tutorial\n";
-
-   #ifdef AUTONGC_TEST_CASE
-      msg += "23. AutoNGCDriver\n";
-   #endif
-
+	msg += "23. DebrisDeorbit\n";
 
 	while (testing)
 	{
-		std::cout << msg
-			<< std::endl;
+		//std::cout << msg
+		//	<< std::endl;
 
-		std::cout << "Input test case: ";
-		std::cin >> inputString;
+		//std::cout << "Input test case: ";
+		//std::cin >> inputString;
+		inputString = "23";
 
 		if (inputString == "A")
 		{
@@ -377,7 +375,8 @@ int main(int argc, char *argv[])
 			CatalyticGasOilCrackerDriver         *driver19 = new CatalyticGasOilCrackerDriver();
 			LinearTangentSteeringStaticVarDriver *driver20 = new LinearTangentSteeringStaticVarDriver();
 			HohmannTransferDriver                *driver21 = new HohmannTransferDriver();
-			TutorialDriver               *driver22 = new TutorialDriver();
+			TutorialDriver                       *driver22 = new TutorialDriver();
+			DebrisDeorbitDriver 				 *driver23 = new DebrisDeorbitDriver();
 
 			driver1->Run();
 			driver101->Run();
@@ -404,6 +403,7 @@ int main(int argc, char *argv[])
 			driver20->Run();
 			driver21->Run();
 			driver22->Run();
+			driver23->Run();
 
 			delete driver1;
 			delete driver101;
@@ -430,6 +430,7 @@ int main(int argc, char *argv[])
 			delete driver20;
 			delete driver21;
 			delete driver22;
+			delete driver23;
 
 			Real duration = (std::clock() - starttime) / (double)CLOCKS_PER_SEC;
 			std::cout << "Total run time: " << duration << " sec\n\n";
@@ -575,46 +576,21 @@ int main(int argc, char *argv[])
 				driver = new TutorialDriver();
 				break;
 
-         #ifdef AUTONGC_TEST_CASE
-            case 23:
-            {
-               Rvector6 kepState, cartState;
-               Real initMass = 1000.0;
-               AutoNGCDriver *testNGC;
-               test = "AutoNGCDriver";
-               kepState(0) = 7000.0 + 400.0 * 1.8339;
-               kepState(1) = 0.7559 / 100.0;
-               kepState(2) = GmatMathUtil::RadToDeg(GmatMathConstants::PI / 2.0 * 0.5298);
-               kepState(3) = GmatMathUtil::RadToDeg(2.0 * GmatMathConstants::PI * 0.2298);
-               kepState(4) = GmatMathUtil::RadToDeg(2.0 * GmatMathConstants::PI * 0.8722);
-               kepState(5) = GmatMathUtil::RadToDeg(2.0 * GmatMathConstants::PI * 0.3490);
-               cartState = StateConversionUtil::Convert(kepState, "Keplerian", "Cartesian");
-               testNGC = new AutoNGCDriver();
-               testNGC->InitializeProblemData(35000.0, cartState, initMass);
-               testNGC->Initialize();
-               Trajectory *traj = testNGC->GetTrajectory();
-               Rvector  dv2 = traj->GetDecisionVector();
-               Rvector  C = traj->GetCostConstraintFunctions();
-               Rvector z = dv2;
-               Rvector F(C.GetSize());
-               Rvector xmul(dv2.GetSize());
-               Rvector Fmul(C.GetSize());
-               Integer exitFlag;
-               testNGC->Optimize(z, F, xmul, Fmul, exitFlag);
-               delete testNGC;
-               break;
-            }
-         #endif
+			case 23:
+				test = "DebrisDeorbit";
+				driver = new DebrisDeorbitDriver();
+				break;
 
 			default:
 				std::cout << "Invalid test case. Try again.\n";
 				break;
 			}
 
-         // Note: The AutoNGC test is run differently, so do not use RunTest 
-         // here for that case (test 23)
-			if (input >= 0 && input != 23)
+			if (input >= 0)
 				RunTest(&driver/*, outputDirectory */);
+
+			// Stop test program after an iteration
+			testing = false;
 		}
 	}
 	std::cout << "Exiting TestOptCtrl." << std::endl;

@@ -71,7 +71,8 @@ SET(CSALT_TEST_SRCS
     src/TestOptCtrl/src/drivers/RayleighDriver.cpp
     src/TestOptCtrl/src/drivers/SchwartzDriver.cpp
     src/TestOptCtrl/src/drivers/HohmannTransferDriver.cpp
-	src/TestOptCtrl/src/drivers/TutorialDriver.cpp
+	  src/TestOptCtrl/src/drivers/TutorialDriver.cpp
+    src/TestOptCtrl/src/drivers/DebrisDeorbitDriver.cpp
     src/TestOptCtrl/src/pointpath/GoddardRocketThreePhasePathObject.cpp
     src/TestOptCtrl/src/pointpath/GoddardRocketThreePhasePointObject.cpp
     src/TestOptCtrl/src/pointpath/SchwartzPathObject.cpp
@@ -116,8 +117,12 @@ SET(CSALT_TEST_SRCS
     src/TestOptCtrl/src/pointpath/ObstacleAvoidancePathObject.cpp
     src/TestOptCtrl/src/pointpath/HohmannTransferPointObject.cpp
     src/TestOptCtrl/src/pointpath/HohmannTransferPathObject.cpp
-	src/TestOptCtrl/src/pointpath/TutorialPointObject.cpp
+	  src/TestOptCtrl/src/pointpath/TutorialPointObject.cpp
     src/TestOptCtrl/src/pointpath/TutorialPathObject.cpp
+    src/TestOptCtrl/src/pointpath/DebrisDeorbitPathObject.cpp
+    src/TestOptCtrl/src/pointpath/DebrisDeorbitPointObject.cpp
+    src/TestOptCtrl/src/pointpath/DebrisDeorbitInitialStateConstraint.cpp
+    src/TestOptCtrl/src/pointpath/DebrisDeorbitFinalStateConstraint.cpp
 )
 
 # ====================================================================
