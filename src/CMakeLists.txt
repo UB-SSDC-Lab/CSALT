@@ -34,6 +34,11 @@ if (GMAT_INCLUDE_CSALT)
    GET_DIRECTORY_PROPERTY(tmp DIRECTORY ${SRCDIR} DEFINITION TargetName)
    SET(SrcTargets ${SrcTargets} ${tmp})
 
+   SET(SRCDIR "csaltApplication")
+   ADD_SUBDIRECTORY(${SRCDIR})
+   GET_DIRECTORY_PROPERTY(tmp DIRECTORY ${SRCDIR} DEFINITION TargetName)
+   SET(SrcTargets ${SrcTargets} ${tmp})
+
    if(GMAT_INCLUDE_CSALT_TESTPROGRAM)   
       SET(SRCDIR "csaltTester")
       ADD_SUBDIRECTORY(${SRCDIR})

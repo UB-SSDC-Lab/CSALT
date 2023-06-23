@@ -28,15 +28,10 @@ SET(TargetName CSALTTester)
 ADD_DEFINITIONS("-D_DYNAMICLINK")
 
 Set(CSALT_TEST_DIRS
-   src/HelperClasses
    src/TestOptCtrl/src
    src/TestOptCtrl/src/drivers
    src/TestOptCtrl/src/pointpath
    src/TestOptCtrl/src/guess
-   src/TestAPI/src
-   src/TestAPI/src/drivers
-   src/TestAPI/src/guess
-   src/TestAPI/src/pointpath
    ${CSALT_DIRS}
    ${CSALT_C_WRAPPER_DIRS}
    ${UTIL_DIRS}
