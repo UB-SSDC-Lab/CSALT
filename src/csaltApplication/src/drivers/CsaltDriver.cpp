@@ -71,6 +71,11 @@ CsaltDriver& CsaltDriver::operator=(const CsaltDriver& driver)
     return *this;
 }
 
+void CsaltDriver::SetInputFile(const std::string& inFile)
+{
+    inputFile = inFile;
+}
+
 Integer CsaltDriver::Run()
 {
     // Instantiate return value
@@ -196,4 +201,97 @@ Real CsaltDriver::GetMaxError(const Rmatrix &mat)
                 max = mat(ii,jj);
 
     return max;
+}
+
+void CsaltDriver::GetKeyValuePair(std::string s, std::string& key, std::string& val)
+{
+    // Get key by splitting by delimiter
+    std::string del = "=";
+    Integer pos = s.find(del);
+    if (pos != std::string::npos) {
+        key = s.substr(0, pos);
+
+        // Remove white space
+        key.erase(
+            std::remove_if(
+                key.begin(), 
+                key.end(), 
+                ::isspace), 
+            key.end());
+
+        // Remove substring from original string
+        s.erase(0, pos + del.length());
+    }
+    else { // Should throw error here but just printing message for now
+        std::cout << "Key value string missing equality sign delimiter!\n";
+    }
+
+    // Remove white space from remaining string and set value
+    val = s;
+    val.erase(
+        std::remove_if(
+            val.begin(),
+            val.end(),
+            ::isspace),
+        val.end());
+}
+
+Rvector CsaltDriver::StringToRvector(std::string s)
+{
+    // Strip white space and brackets
+    s.erase(std::remove_if(s.begin(),s.end(),::isspace),s.end());
+    s.erase(std::remove(s.begin(),s.end(),'['),s.end());
+    s.erase(std::remove(s.begin(),s.end(),']'),s.end());
+
+    // Allocate vector to push values to
+    Integer pos = 0;
+    std::string sval;
+    std::string del = ",";
+    std::vector<Real> vals;
+    while ((pos = s.find(del)) != std::string::npos)
+    {
+        // Get value and erase from string
+        sval = s.substr(0, pos);
+        s.erase(0, pos + del.length());
+
+        // Push double to vector
+        vals.push_back(std::stod(sval));
+    }
+
+    // Push final number to vector
+    vals.push_back(std::stod(s));
+
+    // Fill Rvector and return
+    Rvector out(vals.size());
+    for (Integer i = 0; i < vals.size(); i++)
+        out(i) = vals.at(i);
+    return out;
+}
+
+IntegerArray CsaltDriver::StringToIntegerArray(std::string s)
+{
+    // Strip white space and brackets
+    s.erase(std::remove_if(s.begin(),s.end(),::isspace),s.end());
+    s.erase(std::remove(s.begin(),s.end(),'['),s.end());
+    s.erase(std::remove(s.begin(),s.end(),']'),s.end());
+
+    // Allocate vector to push values to
+    std::string sval;
+    std::string del = ",";
+    Integer pos = 0;
+    IntegerArray out;
+    while ((pos = s.find(del)) != std::string::npos)
+    {
+        // Get value  and erase from string
+        sval = s.substr(0, pos);
+        s.erase(0, pos + del.length());
+
+        // Push double to vector
+        out.push_back(std::stoi(sval));
+    }
+
+    // Push final number to vector
+    out.push_back(std::stoi(s));
+
+    return out;
 }

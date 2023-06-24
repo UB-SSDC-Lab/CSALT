@@ -12,6 +12,7 @@ public:
     CsaltDriver(const CsaltDriver& driver);
     CsaltDriver& operator=(const CsaltDriver& driver);
     virtual ~CsaltDriver();
+    void SetInputFile(const std::string &inFile);
 
     enum Verbosity
     {
@@ -35,6 +36,10 @@ protected:
 
     // Name of problem
     std::string probName;
+
+    // Problem input files
+    std::string inputFile;
+    std::string ochFile;
 
     // Verbosity level
     Verbosity verbosity;
@@ -70,6 +75,11 @@ protected:
 
     // A useful value
     static const Real INF;
+
+    // Some useful methods for reading input files
+    void GetKeyValuePair(std::string s, std::string& key, std::string& val);
+    Rvector StringToRvector(std::string s);
+    IntegerArray StringToIntegerArray(std::string s);
 };
 
 #endif

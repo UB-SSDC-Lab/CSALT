@@ -5,16 +5,14 @@
 #include "DebrisDeorbitInitialStateConstraint.hpp"
 #include "DebrisDeorbitFinalStateConstraint.hpp"
 
-DebrisDeorbitDriver::DebrisDeorbitDriver() : CsaltDriver("DebrisDeorbit") 
-{
-    SetParameters();
-}
+#include <fstream>
+#include <sstream>
+#include <string>
+
+DebrisDeorbitDriver::DebrisDeorbitDriver() : CsaltDriver("DebrisDeorbit") {}
 
 DebrisDeorbitDriver::DebrisDeorbitDriver(const std::string &testName, const Integer snoptConsoleOutputLevel) :
-    CsaltDriver(testName, snoptConsoleOutputLevel) 
-{
-    SetParameters();
-}
+    CsaltDriver(testName, snoptConsoleOutputLevel) {}
 
 DebrisDeorbitDriver::~DebrisDeorbitDriver() {}
 
@@ -33,7 +31,7 @@ void DebrisDeorbitDriver::SetParameters()
                              -GmatMathConstants::PI, 
                              0.0, 
                              -2.0*GmatMathConstants::PI, 
-                             -0.5 * GmatMathConstants::PI / 180.0, 
+                             -5.0 * GmatMathConstants::PI / 180.0, 
                              30.0001e-3, 
                              -1.0e-3);
     state_UB    = Rvector(8, 10000.0,
@@ -41,7 +39,7 @@ void DebrisDeorbitDriver::SetParameters()
                              GmatMathConstants::PI,
                              100.0 * GmatMathConstants::PI,
                              2.0*GmatMathConstants::PI,
-                             0.5 * GmatMathConstants::PI / 180.0,
+                             5.0 * GmatMathConstants::PI / 180.0,
                              35.0e-3,
                              1.0e-3);
 
@@ -87,6 +85,9 @@ void DebrisDeorbitDriver::SetParameters()
 
 void DebrisDeorbitDriver::SetPointPathAndProperties()
 {
+    // Process the input file 
+    ProcessInputFile();
+
     // Instantiate point and path objects
     pathObject = new DebrisDeorbitPathObject();
     pointObject = new DebrisDeorbitPointObject();
@@ -106,15 +107,22 @@ void DebrisDeorbitDriver::SetPointPathAndProperties()
     pointObject->AddFunctions(funcList);
 
     // Set properties
-    maxMeshRefinementCount      = 20;
-    majorIterationsLimits[0]    = 500;
-    totalIterationsLimits[0]    = 200000;
-    optimizationMode            = StringArray(1, "Minimize");
+    maxMeshRefinementCount      = maxMeshRefinements;
+    majorIterationsLimits[0]    = maxMajorIterations;
+    totalIterationsLimits[0]    = maxTotalIterations;
+    if (mode == "MINIMIZE")
+        optimizationMode.push_back("Minimize");
+    else if (mode == "FP")
+        optimizationMode.push_back("Feasible point");
+    else {
+        std::cout << "Unsupported option for MODE, setting mode to FP";
+        optimizationMode.push_back("Feasible point");
+    }
 
     majorOptimalityTolerances.SetSize(1);
     feasibilityTolerances.SetSize(1);
-    majorOptimalityTolerances(0)    = 1e-5;
-    feasibilityTolerances(0)        = 1e-5;
+    majorOptimalityTolerances(0)    = majorOptimalityTol;
+    feasibilityTolerances(0)        = feasibilityTol;
 }
 
 void DebrisDeorbitDriver::SetOptimalControlFunctions(std::vector<OptimalControlFunction*>& funcList)
@@ -124,17 +132,52 @@ void DebrisDeorbitDriver::SetOptimalControlFunctions(std::vector<OptimalControlF
 
     // ===== Initial state constraint
     if (initStateCon) {
-        // Set state constraints
-        Rvector initialState(5, a0, e0, aop0, ta0, alpha0);
-
-        // Set state constraint idxs
+        // Allocate vector we can push constraints and their indecies to
+        std::vector<Real> initialStateVec;
         IntegerArray initialStateIdxs;
-        for (Integer i = 0; i < 5; i++)
-            initialStateIdxs.push_back(i);
+
+        // Determing the number of initial state constraints
+        if (a0_con_on) {
+            initialStateVec.push_back(a0);
+            initialStateIdxs.push_back(0);
+        }
+        if (e0_con_on) {
+            initialStateVec.push_back(e0);
+            initialStateIdxs.push_back(1);
+        }
+        if (aop0_con_on) {
+            initialStateVec.push_back(aop0);
+            initialStateIdxs.push_back(2);
+        }
+        if (ta0_con_on) {
+            initialStateVec.push_back(ta0);
+            initialStateIdxs.push_back(3);
+        }
+        if (alpha0_con_on) {
+            initialStateVec.push_back(alpha0);
+            initialStateIdxs.push_back(4);
+        }
+        if (d_alpha0_con_on) {
+            initialStateVec.push_back(d_alpha0);
+            initialStateIdxs.push_back(5);
+        }
+        if (L0_con_on) {
+            initialStateVec.push_back(L0);
+            initialStateIdxs.push_back(6);
+        }
+        if (d_L0_con_on) {
+            initialStateVec.push_back(d_L0);
+            initialStateIdxs.push_back(7);
+        }
+
+        // Set state constraints
+        Rvector initialState(initialStateVec.size());
+        for (Integer i = 0; i < initialStateVec.size(); i++)
+            initialState(i) = initialStateVec.at(i);
 
         // Set upper and lower bounds
-        Rvector functionLB(5);
-        Rvector functionUB(5);
+        Rvector functionLB(initialStateVec.size());
+        Rvector functionUB(initialStateVec.size());
         functionLB.MakeZeroVector();
         functionUB.MakeZeroVector();
 
@@ -152,7 +195,7 @@ void DebrisDeorbitDriver::SetOptimalControlFunctions(std::vector<OptimalControlF
 
         // Initialize constraint
         initCon->Initialize();
-        initCon->SetNumFunctions(5);
+        initCon->SetNumFunctions(initialStateVec.size());
         initCon->SetPhaseList(phaseList);
         initCon->SetPhaseDependencies(phaseDepends);
         initCon->SetPointDependencies(pointDepends);
@@ -165,7 +208,7 @@ void DebrisDeorbitDriver::SetOptimalControlFunctions(std::vector<OptimalControlF
     }
 
     // Final state constraint
-    if (finStateCon) {
+    if (finStateCon && rpf_con_on) {
         // Set upper and lower bounds
         Rvector functionLB(1);
         Rvector functionUB(1);
@@ -207,19 +250,11 @@ void DebrisDeorbitDriver::SetupPhases()
     std::string initialGuessMode    = "OCHFile";
 
     // Set mesh properties
-    Integer n = 10;
-    Integer m = 12;
-    Real step = 2.0 / (n - 1);
-    Rvector meshIntervalFractions(n);
-    IntegerArray meshIntervalNumPoints;
-    for (Integer i = 0; i < n - 1; i++) {
-        meshIntervalFractions(i) = -1.0 + step*i;
-        meshIntervalNumPoints.push_back(m);
-    }
-    meshIntervalFractions(n - 1) = 1.0;
+    Rvector meshIntervalFractions = meshFractions;
+    IntegerArray meshIntervalNumPoints = meshNumPoints;
 
     // Set phase properties 
-    phase1->SetRelativeErrorTol(5e-6);
+    phase1->SetRelativeErrorTol(meshRelTol);
     phase1->SetInitialGuessMode(initialGuessMode);
     phase1->SetGuessFileName(ochFile);
     phase1->SetNumStateVars(8);
@@ -237,4 +272,243 @@ void DebrisDeorbitDriver::SetupPhases()
 
     // Push phase to phase list
     phaseList.push_back(phase1);
+}
+
+void DebrisDeorbitDriver::ProcessInputFile()
+{
+    // Instantiate file stream
+    std::ifstream infile(inputFile);
+
+    // Loop through file line by line
+    InputFileLocation loc = NS;
+    std::string line, key, val;
+    while (std::getline(infile, line))
+    {
+        if (loc == NS) { // Not in section currently, see if we're entering a section
+            if (line.find("META_START") != std::string::npos)
+                loc = META;
+            else if (line.find("GUESS_START") != std::string::npos)
+                loc = GUESS;
+            else if (line.find("PARAMETERS_START") != std::string::npos)
+                loc = PARAMETERS;
+            else if (line.find("BOUNDS_START") != std::string::npos) 
+                loc = BOUNDS;
+            else if (line.find("MESH_START") != std::string::npos)
+                loc = MESH;
+            else if (line.find("CONSTRAINTS_START") != std::string::npos)
+                loc = CONSTRAINTS;
+        }
+        else {
+            if (loc == META) {
+                if (line.find("META_STOP") != std::string::npos)
+                    loc = NS;
+                else { // Process meta data
+                    // Grab key and value
+                    GetKeyValuePair(line, key, val);
+
+                    // Set value for key
+                    if (key.find("MODE") != std::string::npos)
+                        mode = val;                    
+                    else if (key.find("MAX_MESH_REFINEMENTS") != std::string::npos)
+                        maxMeshRefinements = std::stoi(val); 
+                    else if (key.find("MAX_MAJOR_ITERATIONS") != std::string::npos)
+                        maxMajorIterations = std::stoi(val);
+                    else if (key.find("MAX_TOTAL_ITERATIONS") != std::string::npos)
+                        maxTotalIterations = std::stoi(val);
+                    else if (key.find("MAJOR_OPTIMALITY_TOL") != std::string::npos)
+                        majorOptimalityTol = std::stod(val);
+                    else if (key.find("FEASIBILITY_TOL") != std::string::npos)
+                        feasibilityTol = std::stod(val);
+                    else if (key.find("MESH_REL_TOL") != std::string::npos) 
+                        meshRelTol = std::stod(val);
+                }
+            }
+            else if (loc == GUESS) {
+                if (line.find("GUESS_STOP") != std::string::npos)
+                    loc = NS;
+                else { // Process guess data
+                    // Grab key and value
+                    GetKeyValuePair(line, key, val);
+
+                    // Set value for key
+                    if (key.find("GUESS_FILE") != std::string::npos) {
+                        ochFile = val;
+                        ochFile.erase(std::remove(ochFile.begin(),ochFile.end(),'\"'),ochFile.end());
+                    }
+                    else if (key.find("GUESS_T0") != std::string::npos)
+                        guess_t0 = std::stod(val);
+                    else if (key.find("GUESS_TF") != std::string::npos)
+                        guess_tf = std::stod(val);
+                }
+            }
+            else if (loc == PARAMETERS) {
+                if (line.find("PARAMETERS_STOP") != std::string::npos)
+                    loc = NS;
+                else { // Process parameter data
+                    // Grab key and value
+                    GetKeyValuePair(line, key, val);
+
+                    // Set value for key
+                    if (key.find("MU") != std::string::npos)
+                        mu = std::stod(val);
+                    else if (key.find("T_MAX") != std::string::npos)
+                        tMax = std::stod(val);
+                    else if (key.find("M1") != std::string::npos)
+                        m1 = std::stod(val);
+                    else if (key.find("M2") != std::string::npos)
+                        m2 = std::stod(val);
+                    else if (key.find("MT") != std::string::npos)
+                        mt = std::stod(val);
+                    else if (key.find("L0") != std::string::npos)
+                        l0 = std::stod(val);
+                    else if (key.find("K") != std::string::npos)
+                        k = std::stod(val);
+                    else if (key.find("C") != std::string::npos)
+                        c = std::stod(val);
+                }
+            }
+            else if (loc == BOUNDS) {
+                if (line.find("BOUNDS_STOP") != std::string::npos)
+                    loc = NS;
+                else { // Process bounds data
+                    // Grab key and value
+                    GetKeyValuePair(line, key, val);
+
+                    // Set value for key
+                    if (key.find("TIME_LB") != std::string::npos)
+                        time_LB = std::stod(val);
+                    else if (key.find("TIME_UB") != std::string::npos)
+                        time_UB = std::stod(val);
+                    else if (key.find("STATE_LB") != std::string::npos)
+                        state_LB = StringToRvector(val);
+                    else if (key.find("STATE_UB") != std::string::npos)
+                        state_UB = StringToRvector(val);
+                    else if (key.find("CONTROL_LB") != std::string::npos)
+                        control_LB = StringToRvector(val);
+                    else if (key.find("CONTROL_UB") != std::string::npos)
+                        control_UB = StringToRvector(val);
+                }
+            }
+            else if (loc == MESH) {
+                if (line.find("MESH_STOP") != std::string::npos)
+                    loc = NS;
+                else { // Process mesh data
+                    // Grab key and value
+                    GetKeyValuePair(line, key, val);
+
+                    // Set value for key
+                    if (key.find("MESH_FRACS") != std::string::npos)
+                        meshFractions = StringToRvector(val);
+                    else if (key.find("MESH_NPOINT") != std::string::npos)
+                        meshNumPoints = StringToIntegerArray(val);
+                }
+            }
+            else if (loc == CONSTRAINTS) {
+                if (line.find("CONSTRAINTS_STOP") != std::string::npos)
+                    loc = NS;
+                else { // Process constraint data
+                    // Grab key and value
+                    GetKeyValuePair(line, key, val);
+
+                    // Set value for key
+                    if (key.find("T0") != std::string::npos)
+                        t0 = std::stod(val);
+                    else if (key.find("A0") != std::string::npos) {
+                        if (val.find("UNCONSTRAINED") != std::string::npos) {
+                            a0 = 0.0;
+                            a0_con_on = false;
+                        }
+                        else {
+                            a0 = std::stod(val); 
+                            a0_con_on = true;
+                        }
+                    }
+                    else if (key.find("E0") != std::string::npos) {
+                        if (val.find("UNCONSTRAINED") != std::string::npos) {
+                            e0 = 0.0;
+                            e0_con_on = false;
+                        }
+                        else {
+                            e0 = std::stod(val);
+                            e0_con_on = true;
+                        }
+                    }
+                    else if (key.find("AOP0") != std::string::npos) {
+                        if (val.find("UNCONSTRAINED") != std::string::npos) {
+                            aop0 = 0.0;
+                            aop0_con_on = false;
+                        }
+                        else {
+                            aop0 = std::stod(val);
+                            aop0_con_on = true;
+                        }
+                    }
+                    else if (key.find("TA0") != std::string::npos) {
+                        if (val.find("UNCONSTRAINED") != std::string::npos) {
+                            ta0 = 0.0;
+                            ta0_con_on = false;
+                        }
+                        else {
+                            ta0 = std::stod(val);
+                            ta0_con_on = true;
+                        }
+                    }
+                    else if (key.find("ALPHA0") != std::string::npos) {
+                        if (val.find("UNCONSTRAINED") != std::string::npos) {
+                            alpha0 = 0.0;
+                            alpha0_con_on = false;
+                        }
+                        else {
+                            alpha0 = std::stod(val);
+                            alpha0_con_on = true;
+                        }
+                    }
+                    else if (key.find("D_ALPHA0") != std::string::npos) {
+                        if (val.find("UNCONSTRAINED") != std::string::npos) {
+                            d_alpha0 = 0.0;
+                            d_alpha0_con_on = false;
+                        }
+                        else {
+                            d_alpha0 = std::stod(val);
+                            d_alpha0_con_on = true;
+                        }
+                    }
+                    else if (key.find("L0") != std::string::npos) {
+                        if (val.find("UNCONSTRAINED") != std::string::npos) {
+                            L0 = 0.0;
+                            L0_con_on = false;
+                        }
+                        else {
+                            L0 = std::stod(val);
+                            L0_con_on = true;
+                        }
+                    }
+                    else if (key.find("D_L0") != std::string::npos) {
+                        if (val.find("UNCONSTRAINED") != std::string::npos) {
+                            d_L0 = 0.0;
+                            d_L0_con_on = false;
+                        }
+                        else {
+                            d_L0 = std::stod(val);
+                            d_L0_con_on = true;
+                        }
+                    }
+                    else if (key.find("RPF") != std::string::npos) {
+                        if (val.find("UNCONSTRAINED") != std::string::npos) {
+                            rpf = 0.0;
+                            rpf_con_on = false;
+                        }
+                        else {
+                            rpf = std::stod(val);
+                            rpf_con_on = true;
+                        }
+                    }
+                    else if (key.find("TF_MIN") != std::string::npos) 
+                        tfmin = std::stod(val);
+                    else if (key.find("TF_MAX") != std::string::npos)
+                        tfmax = std::stod(val);
+                }
+            }
+        }
+    }
 }

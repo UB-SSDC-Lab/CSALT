@@ -7,8 +7,7 @@ int main(int argc, char *argv[])
     // Instantiate some requirements
     std::string msg;
     std::string prob;
-    std::string inFile;
-    Integer problem_id;
+    std::string inFile = "";
 
     // Instantiate CsaltDriver null pointer
     CsaltDriver *driver = NULL;
@@ -86,12 +85,20 @@ int main(int argc, char *argv[])
 
         std::cout << msg << std::endl;
         std::cout << "Input desired problem (name or number): ";
-        std::cin >> prob;
+        //std::cin >> prob;
+        prob = "1";
     }
 
     // Create driver if valid problem was specified
-    if (prob == "1" || prob == "DebrisDeorbit")
+    if (prob == "1" || prob == "DebrisDeorbit") {
         driver = new DebrisDeorbitDriver("DebrisDeorbit", 1);
+
+        // Set input file
+        if (inFile == "")
+            driver->SetInputFile("./../data/csalt/ddo_input.txt");
+        else
+            driver->SetInputFile(inFile);
+    }
     else {
         std::cout << "Error: Invalid problem specified.\n";
         return 1;

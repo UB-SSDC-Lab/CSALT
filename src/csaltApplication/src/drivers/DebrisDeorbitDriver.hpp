@@ -10,30 +10,29 @@ public:
     DebrisDeorbitDriver();
     DebrisDeorbitDriver(const std::string &testName, const Integer snoptConsoleOutputLevel);
     virtual ~DebrisDeorbitDriver();
+
 protected:
     virtual void SetParameters();
+    virtual void ProcessInputFile();
     virtual void SetPointPathAndProperties();
     virtual void SetOptimalControlFunctions(std::vector<OptimalControlFunction*>& funcList);
     virtual void SetupPhases();
 
-    // Problem units
-    Real TU;
-    Real LU;
+    // Meta information
+    std::string mode;
+    Integer maxMeshRefinements;
+    Integer maxMajorIterations;
+    Integer maxTotalIterations;
+    Real majorOptimalityTol;
+    Real feasibilityTol;
+    Real meshRelTol;
 
-    // Parameter bounds
-    Real time_LB;
-    Real time_UB;
-    Rvector state_LB;
-    Rvector state_UB;
-    Rvector control_LB;
-    Rvector control_UB;
-
-    // Initial guess parameters
+    // Guess information
+    std::string ochFile;
     Real guess_t0;
     Real guess_tf;
-    std::string ochFile;
 
-    // Path function constants
+    // Parameters
     Real mu;
     Real tMax;
     Real m1;
@@ -43,16 +42,58 @@ protected:
     Real k;
     Real c;
 
-    // Point function constants
+    // Problem units (not currently used)
+    Real TU;
+    Real LU;
+
+    // Bounds
+    Real time_LB;
+    Real time_UB;
+    Rvector state_LB;
+    Rvector state_UB;
+    Rvector control_LB;
+    Rvector control_UB;
+
+    // Mesh
+    Rvector meshFractions;
+    IntegerArray meshNumPoints;
+
+    // Initial state constraints
     Real t0;
+    Real a0;
+    bool a0_con_on;
+    Real e0;
+    bool e0_con_on;
+    Real aop0;
+    bool aop0_con_on;
+    Real ta0;
+    bool ta0_con_on;
+    Real alpha0;
+    bool alpha0_con_on;
+    Real d_alpha0;
+    bool d_alpha0_con_on;
+    Real L0;
+    bool L0_con_on;
+    Real d_L0;
+    bool d_L0_con_on;
+
+    // Final state constraints
+    Real rpf;
+    bool rpf_con_on;
     Real tfmin;
     Real tfmax;
-    Real a0;
-    Real e0;
-    Real aop0;
-    Real ta0;
-    Real alpha0;
-    Real rpf;
+
+    // Define an enum for reading input file
+    enum InputFileLocation
+    {
+        NS,
+        META,
+        GUESS, 
+        PARAMETERS,
+        BOUNDS,
+        MESH,
+        CONSTRAINTS
+    };
 };
 
 #endif
