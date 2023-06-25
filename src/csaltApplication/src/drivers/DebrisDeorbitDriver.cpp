@@ -250,8 +250,25 @@ void DebrisDeorbitDriver::SetupPhases()
     std::string initialGuessMode    = "OCHFile";
 
     // Set mesh properties
-    Rvector meshIntervalFractions = meshFractions;
-    IntegerArray meshIntervalNumPoints = meshNumPoints;
+    Rvector meshIntervalFractions;
+    IntegerArray meshIntervalNumPoints;
+    if (meshFractions.GetSize() > 1) {
+        // If mesh properties directly set in input file, just set
+        meshIntervalFractions = meshFractions;
+        meshIntervalNumPoints = meshNumPoints;
+    }
+    else {
+        // Only number of mesh fractions and points specified, create mesh
+        Integer n = Integer (meshFractions(0));
+        Integer m = meshNumPoints[0];
+        Real step = 2.0 / (meshFractions(0) - 1.0);
+        meshIntervalFractions.SetSize(n);
+        for (Integer i = 0; i < n - 1; i++) {
+            meshIntervalFractions(i) = -1.0 + step*i;
+            meshIntervalNumPoints.push_back(m);
+        }
+        meshIntervalFractions(n - 1) = 1.0;
+    }
 
     // Set phase properties 
     phase1->SetRelativeErrorTol(meshRelTol);
@@ -309,6 +326,13 @@ void DebrisDeorbitDriver::ProcessInputFile()
                     // Set value for key
                     if (key.find("MODE") != std::string::npos)
                         mode = val;                    
+                    if (key.find("SOL_FILE") != std::string::npos) {
+                        controlHistoryFile = val;
+                        controlHistoryFile.erase(std::remove(controlHistoryFile.begin(),
+                                                             controlHistoryFile.end(),
+                                                             '\"'),
+                                                 controlHistoryFile.end());
+                    }
                     else if (key.find("MAX_MESH_REFINEMENTS") != std::string::npos)
                         maxMeshRefinements = std::stoi(val); 
                     else if (key.find("MAX_MAJOR_ITERATIONS") != std::string::npos)
@@ -411,9 +435,9 @@ void DebrisDeorbitDriver::ProcessInputFile()
                     GetKeyValuePair(line, key, val);
 
                     // Set value for key
-                    if (key.find("T0") != std::string::npos)
+                    if (key.compare("T0") == 0)
                         t0 = std::stod(val);
-                    else if (key.find("A0") != std::string::npos) {
+                    else if (key.compare("A0") == 0) {
                         if (val.find("UNCONSTRAINED") != std::string::npos) {
                             a0 = 0.0;
                             a0_con_on = false;
@@ -423,7 +447,7 @@ void DebrisDeorbitDriver::ProcessInputFile()
                             a0_con_on = true;
                         }
                     }
-                    else if (key.find("E0") != std::string::npos) {
+                    else if (key.compare("E0") == 0) {
                         if (val.find("UNCONSTRAINED") != std::string::npos) {
                             e0 = 0.0;
                             e0_con_on = false;
@@ -433,7 +457,7 @@ void DebrisDeorbitDriver::ProcessInputFile()
                             e0_con_on = true;
                         }
                     }
-                    else if (key.find("AOP0") != std::string::npos) {
+                    else if (key.compare("AOP0") == 0) {
                         if (val.find("UNCONSTRAINED") != std::string::npos) {
                             aop0 = 0.0;
                             aop0_con_on = false;
@@ -443,7 +467,7 @@ void DebrisDeorbitDriver::ProcessInputFile()
                             aop0_con_on = true;
                         }
                     }
-                    else if (key.find("TA0") != std::string::npos) {
+                    else if (key.compare("TA0") == 0) {
                         if (val.find("UNCONSTRAINED") != std::string::npos) {
                             ta0 = 0.0;
                             ta0_con_on = false;
@@ -453,7 +477,7 @@ void DebrisDeorbitDriver::ProcessInputFile()
                             ta0_con_on = true;
                         }
                     }
-                    else if (key.find("ALPHA0") != std::string::npos) {
+                    else if (key.compare("ALPHA0") == 0) {
                         if (val.find("UNCONSTRAINED") != std::string::npos) {
                             alpha0 = 0.0;
                             alpha0_con_on = false;
@@ -463,7 +487,7 @@ void DebrisDeorbitDriver::ProcessInputFile()
                             alpha0_con_on = true;
                         }
                     }
-                    else if (key.find("D_ALPHA0") != std::string::npos) {
+                    else if (key.compare("D_ALPHA0") == 0) {
                         if (val.find("UNCONSTRAINED") != std::string::npos) {
                             d_alpha0 = 0.0;
                             d_alpha0_con_on = false;
@@ -473,7 +497,7 @@ void DebrisDeorbitDriver::ProcessInputFile()
                             d_alpha0_con_on = true;
                         }
                     }
-                    else if (key.find("L0") != std::string::npos) {
+                    else if (key.compare("L0") == 0) {
                         if (val.find("UNCONSTRAINED") != std::string::npos) {
                             L0 = 0.0;
                             L0_con_on = false;
@@ -483,7 +507,7 @@ void DebrisDeorbitDriver::ProcessInputFile()
                             L0_con_on = true;
                         }
                     }
-                    else if (key.find("D_L0") != std::string::npos) {
+                    else if (key.compare("D_L0") == 0) {
                         if (val.find("UNCONSTRAINED") != std::string::npos) {
                             d_L0 = 0.0;
                             d_L0_con_on = false;
@@ -493,7 +517,7 @@ void DebrisDeorbitDriver::ProcessInputFile()
                             d_L0_con_on = true;
                         }
                     }
-                    else if (key.find("RPF") != std::string::npos) {
+                    else if (key.compare("RPF") == 0) {
                         if (val.find("UNCONSTRAINED") != std::string::npos) {
                             rpf = 0.0;
                             rpf_con_on = false;
@@ -503,9 +527,9 @@ void DebrisDeorbitDriver::ProcessInputFile()
                             rpf_con_on = true;
                         }
                     }
-                    else if (key.find("TF_MIN") != std::string::npos) 
+                    else if (key.compare("TF_MIN") == 0) 
                         tfmin = std::stod(val);
-                    else if (key.find("TF_MAX") != std::string::npos)
+                    else if (key.compare("TF_MAX") == 0)
                         tfmax = std::stod(val);
                 }
             }
