@@ -183,6 +183,19 @@ CSALT/fast:
 .PHONY : CSALT/fast
 
 #=============================================================================
+# Target rules for targets named CSALTApplication
+
+# Build rule for target.
+CSALTApplication: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 CSALTApplication
+.PHONY : CSALTApplication
+
+# fast build rule for target.
+CSALTApplication/fast:
+	$(MAKE) -f src/csaltApplication/CMakeFiles/CSALTApplication.dir/build.make src/csaltApplication/CMakeFiles/CSALTApplication.dir/build
+.PHONY : CSALTApplication/fast
+
+#=============================================================================
 # Target rules for targets named CSALTTester
 
 # Build rule for target.
@@ -209,6 +222,7 @@ help:
 	@echo "... edit_cache"
 	@echo "... GmatUtil"
 	@echo "... CSALT"
+	@echo "... CSALTApplication"
 	@echo "... CSALTTester"
 .PHONY : help
 
