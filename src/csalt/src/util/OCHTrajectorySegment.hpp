@@ -60,6 +60,7 @@ public:
    bool         GetHasStartTime();
    void         SetHasStopTime(bool b);
    bool         GetHasStopTime();
+   bool         MeshDataSet();
 
 
 protected:
@@ -86,6 +87,10 @@ protected:
    Rvector meshIntervalFractions;
    /// The mesh interval number of points
    IntegerArray meshIntervalNumPoints;
+   /// Flags indicating mesh was set
+   bool meshIntervalFractionsSet;
+   bool meshIntervalNumPointsSet;
+
    /// indicates if the segment has a start time
    bool        hasStartTime;
    /// indicates if the segment has a stop time

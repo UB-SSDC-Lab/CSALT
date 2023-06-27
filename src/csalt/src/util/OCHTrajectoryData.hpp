@@ -68,6 +68,7 @@ public:
    virtual IntegerArray GetMeshIntervalNumPoints(Integer forSegment);
    virtual std::vector<Rvector> GetAllMeshIntervalFractions();
    virtual std::vector<IntegerArray> GetAllMeshIntervalNumPoints();
+   virtual bool AllMeshDataSet();
    //virtual std::vector<Rvector> GetAllInitAndFinalTimes();
 
    /// Access functions for exit conditions
@@ -86,6 +87,10 @@ public:
    virtual Real GetMaxMeshRelativeError();
    virtual void SetSolutionType(std::string);
    virtual std::string GetSolutionType();
+
+   virtual std::vector<TrajectoryDataStructure>
+                             Interpolate(Rvector  requestedTimes,
+                                       DataType type = ALL);
 
 protected:
 

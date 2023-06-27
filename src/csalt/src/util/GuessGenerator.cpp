@@ -320,7 +320,13 @@ void GuessGenerator::ComputeGuessFromOCHFile(const std::string &OCHFileName,
     Rvector requestedTimes = ConvertTrajectoryTimeToGuessTime(timeVecType,
                                                               timeVector);
     
+    // Instantiate OCH data object and read OCH file
     OCHTrajectoryData* guessData = new OCHTrajectoryData(OCHFileName);
+
+    // Check if we have mesh data
+    if (guessData->AllMeshDataSet()) {
+
+    }
 
     guessData->SetInterpType(TrajectoryData::NOTAKNOT);
     guessData->SetAllowInterSegmentExtrapolation(true);

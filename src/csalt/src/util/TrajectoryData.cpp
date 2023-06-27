@@ -538,7 +538,7 @@ Rmatrix TrajectoryData::GetIntegral(Rvector requestedTimes)
 */
 //------------------------------------------------------------------------------
 std::vector<TrajectoryDataStructure> TrajectoryData::Interpolate(
-                                     Rvector requestedTimes,DataType type)
+                                     Rvector requestedTimes, DataType type)
 {
    #ifdef DEBUG_INTERPOLATE
       MessageInterface::ShowMessage("Entering Interpolate wth type = %d\n",
@@ -607,10 +607,8 @@ std::vector<TrajectoryDataStructure> TrajectoryData::Interpolate(
       bool success = false;
       if (type == ALL || type == STATE)
       {
-         localData.states.SetSize(
-                          segments_.at(currentSegment)->GetNumStates());
-         for (Integer jdx = 0;
-              jdx < segments_.at(currentSegment)->GetNumStates(); jdx++)
+         localData.states.SetSize(segments_.at(currentSegment)->GetNumStates());
+         for (Integer jdx = 0; jdx < segments_.at(currentSegment)->GetNumStates(); jdx++)
          {
             UpdateInterpPoints(currentSegment,requestedTimes(idx),
                                 STATE,jdx);

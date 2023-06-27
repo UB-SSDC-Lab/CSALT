@@ -38,7 +38,9 @@ OCHTrajectorySegment::OCHTrajectorySegment() :
     refFrame         (""),
     timeSystem       (""),
     hasStartTime     (false),
-    hasStopTime      (false)
+    hasStopTime      (false),
+    meshIntervalFractionsSet(false),
+    meshIntervalNumPointsSet(false)
 {
 }
 
@@ -58,7 +60,11 @@ OCHTrajectorySegment::OCHTrajectorySegment(const OCHTrajectorySegment &copy) :
     refFrame         (copy.refFrame),
     timeSystem       (copy.timeSystem),
     hasStartTime     (copy.hasStartTime),
-    hasStopTime      (copy.hasStopTime)
+    hasStopTime      (copy.hasStopTime),
+    meshIntervalFractions(copy.meshIntervalFractions),
+    meshIntervalNumPoints(copy.meshIntervalNumPoints),
+    meshIntervalFractionsSet(copy.meshIntervalFractionsSet),
+    meshIntervalNumPointsSet(copy.meshIntervalNumPointsSet)
 {
 }
 
@@ -84,6 +90,10 @@ OCHTrajectorySegment& OCHTrajectorySegment::operator=(
     timeSystem      = copy.timeSystem;
     hasStartTime    = copy.hasStartTime;
     hasStopTime     = copy.hasStopTime;
+    meshIntervalFractions = copy.meshIntervalFractions;
+    meshIntervalNumPoints = copy.meshIntervalNumPoints;
+    meshIntervalFractionsSet = copy.meshIntervalFractionsSet;
+    meshIntervalNumPointsSet = copy.meshIntervalNumPointsSet;
 
    return *this;
 }
@@ -190,6 +200,7 @@ std::string OCHTrajectorySegment::GetTimeSystem()
 void OCHTrajectorySegment::SetMeshIntervalFractions(Rvector meshIntFracs)
 {
    meshIntervalFractions = meshIntFracs;
+   meshIntervalFractionsSet = true;
 }
 
 Rvector OCHTrajectorySegment::GetMeshIntervalFractions()
@@ -200,6 +211,7 @@ Rvector OCHTrajectorySegment::GetMeshIntervalFractions()
 void OCHTrajectorySegment::SetMeshIntervalNumPoints(IntegerArray meshIntNumPnts)
 {
    meshIntervalNumPoints = meshIntNumPnts;
+   meshIntervalNumPointsSet = true;
 }
 
 IntegerArray OCHTrajectorySegment::GetMeshIntervalNumPoints()
@@ -227,3 +239,7 @@ bool OCHTrajectorySegment::GetHasStopTime()
    return hasStopTime;
 };
 
+bool OCHTrajectorySegment::MeshDataSet()
+{
+   return (meshIntervalFractionsSet && meshIntervalNumPointsSet);
+}

@@ -287,6 +287,20 @@ std::vector<IntegerArray> OCHTrajectoryData::GetAllMeshIntervalNumPoints()
 }
 
 //------------------------------------------------------------------------------
+// bool AllMeshDataSet()
+//------------------------------------------------------------------------------
+bool OCHTrajectoryData::AllMeshDataSet()
+{
+   bool flag = true;
+   for (Integer i = 0; i < numSegments; i++)
+      if (!((OCHTrajectorySegment*)segments_.at(i))->MeshDataSet()) {
+         flag = false;
+         break;
+      }
+   return flag;
+}
+
+//------------------------------------------------------------------------------
 // void SetFeasibility(Real feas)
 //------------------------------------------------------------------------------
 /**
@@ -759,8 +773,8 @@ void OCHTrajectoryData::ReadFromFile(std::string fileName)
    std::string currLine;
    Integer currSegment = -1;
    Integer lineNumber = 0;
-   Integer dataLine;
-   Integer fileLocation = 0; // 1 = in segment header, 2 = in data, 0 = neither
+   Integer dataLine, meshLine;
+   Integer fileLocation = 0; // 1 = in segment header, 2 = in data, 3 = in mesh, 0 = in nothing
    bool    metaFound = false;
    Integer nmStates    = -1;
    Integer nmControls  = -1;
@@ -800,12 +814,13 @@ void OCHTrajectoryData::ReadFromFile(std::string fileName)
          if (currLine.find("META_START") != std::string::npos) 
          {
             if ((fileLocation == 1) || // already in META - error
-                (fileLocation == 2))   // still in DATA - error
+                (fileLocation == 2) || // still in DATA - error
+                (fileLocation == 3))   // sill in MESH - error
             {
                std::string errmsg = "ERROR reading data from ";
                errmsg += "this file: " + fileName;
-               errmsg += ".  Unexpected META_START found in META ";
-               errmsg += "or DATA block. \n";
+               errmsg += ".  Unexpected META_START found in META, ";
+               errmsg += "DATA, or MESH block. \n";
                throw LowThrustException(errmsg);
             }
             fileLocation = 1;
@@ -847,6 +862,13 @@ void OCHTrajectoryData::ReadFromFile(std::string fileName)
                std::string errmsg = "ERROR reading data from ";
                errmsg += "this file: " + fileName;
                errmsg += ".  Unexpected DATA_START found within DATA block. \n";
+               throw LowThrustException(errmsg);
+            }
+            if (fileLocation == 3)
+            {
+               std::string errmsg = "ERROR reading data from ";
+               errmsg += "this file: " + fileName;
+               errmsg += ".  Unexpected DATA_START found within MESH block. \n";
                throw LowThrustException(errmsg);
             }
             if (!metaFound)
@@ -907,6 +929,45 @@ void OCHTrajectoryData::ReadFromFile(std::string fileName)
 //            nmStates    = -1;
 //            nmControls  = -1;
 //            nmIntegrals = -1;
+         }
+         // Check if mesh section is starting
+         else if (currLine.find("MESH_START") != std::string::npos)
+         {
+            if (fileLocation == 1)  // still in META - error
+            {
+               std::string errmsg = "ERROR reading data from ";
+               errmsg += "this file: " + fileName;
+               errmsg += ".  Missing META_STOP. \n";
+               throw LowThrustException(errmsg);
+            }
+            if (fileLocation == 2)   // already in DATA - error
+            {
+               std::string errmsg = "ERROR reading data from ";
+               errmsg += "this file: " + fileName;
+               errmsg += ".  Unexpected MESH_START found within DATA block. \n";
+               throw LowThrustException(errmsg);
+            }
+            if (fileLocation == 3)
+            {
+               std::string errmsg = "ERROR reading data from ";
+               errmsg += "this file: " + fileName;
+               errmsg += ".  Unexpected MESH_START found within MESH block. \n";
+               throw LowThrustException(errmsg);
+            }
+            fileLocation = 3;
+            meshLine = -1;
+         }
+         // Check if a data segment is ending
+         else if (currLine.find("MESH_STOP") != std::string::npos) 
+         {
+            if (fileLocation != 3)  // error
+            {
+               std::string errmsg = "ERROR reading data from ";
+               errmsg += "this file: " + fileName;
+               errmsg += ".  Unexpected MESH_STOP found outside MESH block. \n";
+               throw LowThrustException(errmsg);
+            }
+            fileLocation = 0;
          }
          else if (fileLocation == 1) // @todo simplify reading META data
          {
@@ -1110,6 +1171,71 @@ void OCHTrajectoryData::ReadFromFile(std::string fileName)
                throw LowThrustException(errmsg);
             }
          } // process the data line (location == 2)
+         else if (fileLocation == 3)
+         {
+            // Process the data line - ignore BLANK lines
+            if (GmatStringUtil::IsBlank(currLine))
+               continue;
+
+            meshLine++;
+
+            // Allocate requirements
+            std::string valStr;
+            if (meshLine == 0)
+            {
+               // Allocate vector to push mesh fractions to
+               std::vector<double> meshFracsVec;
+
+               // Create string stream for current line
+               std::istringstream lineStr(currLine);
+
+               // Loop and add mesh fractions to vector 
+               while (lineStr >> valStr)
+                  meshFracsVec.push_back(stod(valStr));
+
+               // Create Rvector for mesh fracs
+               Rvector meshFracs(meshFracsVec.size());
+               for (Integer idx = 0; idx < meshFracsVec.size(); idx++)
+                  meshFracs(idx) = meshFracsVec.at(idx);
+
+               // Add mesh fractions to OCH data
+               SetMeshIntervalFractions(currSegment, meshFracs);
+            } 
+            else if (meshLine == 1)
+            {
+               // Allocate vector to push mesh number of points to
+               IntegerArray meshNumPoints;
+
+               // Create string stream for current line
+               std::istringstream lineStr(currLine);
+
+               // Loop and add mesh num points to vector
+               while (lineStr >> valStr)
+                  meshNumPoints.push_back(stoi(valStr));
+
+               // Add to mesh interval number of points
+               SetMeshIntervalNumPoints(currSegment, meshNumPoints);
+            }
+            else if (meshLine == 2)
+            {
+               // Create string stream for current line
+               std::istringstream lineStr(currLine);
+
+               // Get initial and final time and set
+               lineStr >> valStr;
+               och->SetStartTime(stod(valStr));
+               lineStr >> valStr;
+               och->SetStopTime(stod(valStr));
+            }
+            else 
+            {
+               // Incorrect number of lines detected in mesh section
+               std::string errmsg = "ERROR initializing guess from ";
+               errmsg += "input file \"" + fileName + "\": more than ";
+               errmsg += "3 lines detected in MESH data.";
+               throw LowThrustException(errmsg);
+            }
+         }
       } // loop through lines in the file
       if (fileLocation == 1)
       {
@@ -1122,6 +1248,13 @@ void OCHTrajectoryData::ReadFromFile(std::string fileName)
       {
          std::string errmsg = "ERROR reading OCH file " + fileName;
          errmsg            += ": DATA_STOP line ";
+         errmsg            += "not found.\n";
+         throw LowThrustException(errmsg);
+      }
+      if (fileLocation == 3)
+      {
+         std::string errmsg = "ERROR reading OCH file " + fileName;
+         errmsg            += ": MESH_STOP line ";
          errmsg            += "not found.\n";
          throw LowThrustException(errmsg);
       }
@@ -1146,4 +1279,256 @@ void OCHTrajectoryData::ReadFromFile(std::string fileName)
       errmsg            += "this file: " + fileName + "\n";
       throw LowThrustException(errmsg);
    }
+}
+
+//------------------------------------------------------------------------------
+// std::vector<TrajectoryDataStructure> Interpolate(Rvector requestedTimes)
+//------------------------------------------------------------------------------
+/**
+* This method performs interpolation at a vector of desired time values
+*
+* @param <requestedTimes> the time values to poll OCH data at
+*
+* @return A vector of data structures corresponding to each requested time
+*
+*/
+//------------------------------------------------------------------------------
+std::vector<TrajectoryDataStructure> OCHTrajectoryData::Interpolate(
+                                     Rvector requestedTimes, DataType type)
+{
+   #ifdef DEBUG_INTERPOLATE
+      MessageInterface::ShowMessage("Entering Interpolate wth type = %d\n",
+                                    type);
+      MessageInterface::ShowMessage("size of requestedTimes = %d\n",
+                                    requestedTimes.GetSize());
+   #endif
+   
+   UpdateInterpolator();
+
+   #ifdef DEBUG_INTERPOLATE
+      MessageInterface::ShowMessage("---> Interpolator updated\n");
+   #endif
+
+   std::vector<TrajectoryDataStructure> output;
+   TrajectoryDataStructure localData;
+
+   localData.states.SetSize(0);
+   localData.controls.SetSize(0);
+   localData.integrals.SetSize(0);
+
+   // Double check that the time values are consecutive
+   Real segTimes[2];
+   Real tPrecision = 1.0e-10, relT;
+
+   for (Integer s = 1; s < numSegments; s++)
+   {
+      segTimes[0] = segments_.at(s-1)->GetTime(segments_.at(s-1)->
+                    GetNumDataPoints()-1);
+      segTimes[1] = segments_.at(s)->GetTime(0);
+      relT = segTimes[0] - segTimes[1];
+      if (fabs(segTimes[0]) > 0.1)
+         relT /= segTimes[0];
+
+      if (relT > tPrecision && !segmentWarningPrinted)
+      {
+         std::stringstream msg;
+         msg.precision(14);
+         msg << "WARNING - TrajectoryData: "
+            << "Time inputs between segments are not monotonically "
+            << "increasing.  For overlapping times, the first segment "
+            << "detected containing the requested time will be used for "
+            << "interpolation.  For gaps between segments, interpolation "
+            << "will be attempted normally.\n ";
+             
+         MessageInterface::ShowMessage(msg.str());
+         segmentWarningPrinted = true;
+      }
+   }
+
+   for (Integer idx = 0; idx < requestedTimes.GetSize(); idx++)
+   {
+      Integer currentSegment = GetRelevantSegment(requestedTimes(idx));
+      #ifdef DEBUG_INTERPOLATE
+         MessageInterface::ShowMessage(
+            "---> relevant segment retrieved for index %d at time %12.10f\n",
+            idx, requestedTimes(idx));
+      #endif
+
+      // start with empty arrays each time
+      localData.states.SetSize(0);
+      localData.controls.SetSize(0);
+      localData.integrals.SetSize(0);
+    
+      localData.time = requestedTimes(idx);
+      bool success = false;
+      if (type == ALL || type == STATE)
+      {
+         localData.states.SetSize(segments_.at(currentSegment)->GetNumStates());
+         for (Integer jdx = 0; jdx < segments_.at(currentSegment)->GetNumStates(); jdx++)
+         {
+            UpdateInterpPoints(currentSegment,requestedTimes(idx),
+                                STATE,jdx);
+
+            if (duplicateTimeFound)
+            {
+               // In this case, assign the requested data as the known
+               // data with the nearest time
+               break;
+            }
+
+            success = interpolator->Interpolate(requestedTimes(idx),
+               &localData.states(jdx));
+            if (!success)
+            {
+               throw LowThrustException("ERROR - TrajectoryData: "
+                  "Interpolation of state data failed at time " +
+                  GmatStringUtil::ToString(requestedTimes(idx), 14) +
+                  " at setgment " +
+                  GmatStringUtil::ToString(currentSegment, 1) + ".\n");
+            }
+         }
+
+         if (duplicateTimeFound)
+         {
+            if (pointToCopy != -1)
+            {
+               for (Integer jdx = 0;
+                  jdx < segments_.at(currentSegment)->GetNumStates(); jdx++)
+               {
+                  // Duplicate was found, copy data of closest time to requested
+                  // time
+                  localData.states(jdx) =
+                     segments_.at(currentSegment)->GetState(pointToCopy, jdx);
+               }
+               // Reset duplicate time data
+               duplicateTimeFound = false;
+               pointToCopy = -1;
+            }
+            else
+            {
+               throw LowThrustException("ERROR - TrajectoryData: "
+                  "Interpolation of state data failed at time " +
+                  GmatStringUtil::ToString(requestedTimes(idx), 14) +
+                  " at setgment " +
+                  GmatStringUtil::ToString(currentSegment, 1) + ".\n");
+            }
+         }
+      }
+
+      if (type == ALL || type == CONTROL)
+      {
+         localData.controls.SetSize(
+                            segments_.at(currentSegment)->GetNumControls());
+         for (Integer jdx = 0;
+              jdx < segments_.at(currentSegment)->GetNumControls(); jdx++)
+         {
+            UpdateInterpPoints(currentSegment,requestedTimes(idx),
+                                CONTROL,jdx);
+
+            if (duplicateTimeFound)
+            {
+               // In this case, assign the requested data as the known
+               // data with the nearest time
+               break;
+            }
+
+            success = interpolator->Interpolate(requestedTimes(idx),
+               &localData.controls(jdx));
+            if (!success)
+            {
+               throw LowThrustException("ERROR - TrajectoryData: "
+                  "Interpolation of control data failed at time " +
+                  GmatStringUtil::ToString(requestedTimes(idx), 14) +
+                  " at setgment " +
+                  GmatStringUtil::ToString(currentSegment, 1) + ".\n");
+            }
+         }
+
+         if (duplicateTimeFound)
+         {
+            if (pointToCopy != -1)
+            {
+               for (Integer jdx = 0;
+                  jdx < segments_.at(currentSegment)->GetNumControls(); jdx++)
+               {
+                  // Duplicate was found, copy data of closest time to requested
+                  // time
+                  localData.controls(jdx) =
+                     segments_.at(currentSegment)->GetControl(pointToCopy, jdx);
+               }
+               // Reset duplicate time data
+               duplicateTimeFound = false;
+               pointToCopy = -1;
+            }
+            else
+            {
+               throw LowThrustException("ERROR - TrajectoryData: "
+                  "Interpolation of control data failed at time " +
+                  GmatStringUtil::ToString(requestedTimes(idx), 14) +
+                  " at setgment " +
+                  GmatStringUtil::ToString(currentSegment, 1) + ".\n");
+            }
+         }
+      }
+
+      if (type == ALL || type == INTEGRAL)
+      {
+         localData.integrals.SetSize(
+                   segments_.at(currentSegment)->GetNumIntegrals());
+         for (Integer jdx = 0;
+              jdx < segments_.at(currentSegment)->GetNumIntegrals(); jdx++)
+         {
+            UpdateInterpPoints(currentSegment,requestedTimes(idx),
+                                INTEGRAL,jdx);
+
+            if (duplicateTimeFound)
+            {
+               // In this case, assign the requested data as the known
+               // data with the nearest time
+               break;
+            }
+
+            success = interpolator->Interpolate(requestedTimes(idx),
+               &localData.integrals(jdx));
+            if (!success)
+            {
+               throw LowThrustException("ERROR - TrajectoryData: "
+                  "Interpolation of control data failed at time " +
+                  GmatStringUtil::ToString(requestedTimes(idx), 14) +
+                  " at setgment " +
+                  GmatStringUtil::ToString(currentSegment, 1) + ".\n");
+            }
+         }
+
+         if (duplicateTimeFound)
+         {
+            if (pointToCopy != -1)
+            {
+               for (Integer jdx = 0;
+                  jdx < segments_.at(currentSegment)->GetNumIntegrals(); jdx++)
+               {
+                  // Duplicate was found, copy data of closest time to requested
+                  // time
+                  localData.integrals(jdx) =
+                     segments_.at(currentSegment)->GetIntegral(pointToCopy, jdx);
+               }
+               // Reset duplicate time data
+               duplicateTimeFound = false;
+               pointToCopy = -1;
+            }
+            else
+            {
+               throw LowThrustException("ERROR - TrajectoryData: "
+                  "Interpolation of integral data failed at time " +
+                  GmatStringUtil::ToString(requestedTimes(idx), 14) +
+                  " at setgment " +
+                  GmatStringUtil::ToString(currentSegment, 1) + ".\n");
+            }
+         }
+      }
+
+      output.push_back(localData);
+    }
+
+    return output;
 }
