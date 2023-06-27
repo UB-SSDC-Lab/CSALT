@@ -104,6 +104,11 @@ void RadauPhase::InitializeTranscription()
       delete transUtil;
    transUtil = new NLPFuncUtilRadau();
    transUtil->Initialize(config);
+
+   // Set maximum polynomial degree increase if set by user
+   if (maxPolyDegIncreaseSet)
+      transUtil->SetMaxPolynomialDegreeIncrease(maxPolyDegIncrease);
+
    #ifdef DEBUG_RADAU_PHASE
       MessageInterface::ShowMessage(
                               "LEAVING RadauPhase::InitializeTranscription\n");

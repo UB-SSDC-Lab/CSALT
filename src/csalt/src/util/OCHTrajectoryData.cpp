@@ -200,6 +200,93 @@ void OCHTrajectoryData::SetTimeSystem(Integer forSegment,
 }
 
 //------------------------------------------------------------------------------
+// void SetMeshIntervalFractions(Integer forSegment,
+//                    Rvector meshIntervalFractions)
+//------------------------------------------------------------------------------
+void OCHTrajectoryData::SetMeshIntervalFractions(Integer forSegment, 
+                                                 Rvector meshIntFracs)
+{
+   if ((forSegment < 0) || (forSegment >= numSegments))
+   {
+      std::string errmsg = "ERROR - OCHTrajectoryData: segment number ";
+      errmsg += "out of range.";
+      throw LowThrustException(errmsg);
+   }
+   ((OCHTrajectorySegment*)segments_.at(forSegment)) ->
+      SetMeshIntervalFractions(meshIntFracs);
+}
+
+//------------------------------------------------------------------------------
+// std::vector<Rvector> GetAllMeshIntervalFractions()
+//------------------------------------------------------------------------------
+std::vector<Rvector> OCHTrajectoryData::GetAllMeshIntervalFractions()
+{
+   std::vector<Rvector> out;
+   for (Integer i = 0; i < numSegments; i++)
+      out.push_back(((OCHTrajectorySegment*)segments_.at(i))->
+         GetMeshIntervalFractions());
+   return out;
+}
+
+//------------------------------------------------------------------------------
+// Rvector GetMeshIntervalFractions(Integer forSegment)
+//------------------------------------------------------------------------------
+Rvector OCHTrajectoryData::GetMeshIntervalFractions(Integer forSegment)
+{
+   if ((forSegment < 0) || (forSegment >= numSegments))
+   {
+      std::string errmsg = "ERROR - OCHTrajectoryData: segment number ";
+      errmsg += "out of range.";
+      throw LowThrustException(errmsg);
+   }
+   return ((OCHTrajectorySegment*)segments_.at(forSegment))->
+      GetMeshIntervalFractions();
+}
+
+//------------------------------------------------------------------------------
+// void SetMeshIntervalNumPoints(Integer forSegment,
+//                    IntegerArray meshIntervalNumPoints)
+//------------------------------------------------------------------------------
+void OCHTrajectoryData::SetMeshIntervalNumPoints(Integer forSegment,
+                                                 IntegerArray meshIntNumPnts)
+{
+   if ((forSegment < 0) || (forSegment >= numSegments))
+   {
+      std::string errmsg = "ERROR - OCHTrajectoryData: segment number ";
+      errmsg += "out of range.";
+      throw LowThrustException(errmsg);
+   }
+   ((OCHTrajectorySegment*)segments_.at(forSegment))->
+      SetMeshIntervalNumPoints(meshIntNumPnts);
+}
+
+//------------------------------------------------------------------------------
+// IntegerArray GetMeshIntervalNumPoints(Integer forSegment)
+//------------------------------------------------------------------------------
+IntegerArray OCHTrajectoryData::GetMeshIntervalNumPoints(Integer forSegment)
+{
+   if ((forSegment < 0) || (forSegment >= numSegments))
+   {
+      std::string errmsg = "ERROR - OCHTrajectoryData: segment number ";
+      errmsg += "out of range.";
+      throw LowThrustException(errmsg);     
+   }
+   return ((OCHTrajectorySegment*)segments_.at(forSegment))->GetMeshIntervalNumPoints();
+}
+
+//------------------------------------------------------------------------------
+// std::vector<IntegerArray> GetAllMeshIntervalNumPoints()
+//------------------------------------------------------------------------------
+std::vector<IntegerArray> OCHTrajectoryData::GetAllMeshIntervalNumPoints()
+{
+   std::vector<IntegerArray> out;
+   for (Integer i = 0; i < numSegments; i++)
+      out.push_back(((OCHTrajectorySegment*)segments_.at(i))->
+         GetMeshIntervalNumPoints());
+   return out;
+}
+
+//------------------------------------------------------------------------------
 // void SetFeasibility(Real feas)
 //------------------------------------------------------------------------------
 /**
@@ -517,10 +604,50 @@ void OCHTrajectoryData::WriteToFile(std::string fileName)
          fOut << "META_STOP" << std::endl;
          fOut << std::endl;
 
+         // Print mesh start header
+         fOut << "MESH_START" << std::endl;
+
+         // Get mesh interval fractions and number of points per subinterval
+         Rvector meshIntervalFractions = och->GetMeshIntervalFractions();
+         IntegerArray meshIntervalNumPoints = och->GetMeshIntervalNumPoints();
+         Integer num_meshIntFracs = meshIntervalFractions.GetSize();
+         Integer num_meshIntNumPnts = meshIntervalNumPoints.size();
+
+         // Loop through mesh interval fractions and print
+         for (Integer idx = 0; idx < num_meshIntFracs; idx++)
+            if (idx == 0)  // first iteration, begin with tab
+               fOut << "\t" << std::setprecision(17) << meshIntervalFractions(idx) << " ";
+            else if (idx == num_meshIntFracs - 1)  // last iteration, do not include final space
+               fOut << std::setprecision(17) << meshIntervalFractions(idx);
+            else 
+               fOut << std::setprecision(17) << meshIntervalFractions(idx) << " ";
+         fOut << std::endl;
+
+         // Loop through number of points per interval
+         for (Integer idx = 0; idx < num_meshIntNumPnts; idx++)
+            if (idx == 0)
+               fOut << "\t" << meshIntervalNumPoints.at(idx) << " ";
+            else if (idx == num_meshIntNumPnts - 1)
+               fOut << meshIntervalNumPoints.at(idx);
+            else
+               fOut << meshIntervalNumPoints.at(idx) << " ";
+         fOut << std::endl;
+
+         // Get initial and final time for printing
+         Integer numData = och->GetNumDataPoints();
+         Real initialTime = och->GetTime(0);
+         Real finalTime = och->GetTime(numData - 1);
+         fOut << "\t" << std::setprecision(17) << initialTime << " ";
+         fOut << std::setprecision(17) << finalTime << std::endl;
+
+         // Finish meta block
+         fOut << "MESH_STOP" << std::endl;
+         fOut << std::endl;
+
          // Loop through all data columns and print the state, then control,
          // then integral data
          fOut << "DATA_START" <<std::endl;
-         Integer numData      = och->GetNumDataPoints();
+         //Integer numData      = och->GetNumDataPoints();
          Integer numStates    = och->GetNumStates();
          Integer numControls  = och->GetNumControls();
          Integer numIntegrals = och->GetNumIntegrals();
@@ -684,9 +811,11 @@ void OCHTrajectoryData::ReadFromFile(std::string fileName)
             fileLocation = 1;
             metaFound = true;
             currSegment++;
+
             // All segments added for this class must be of type
             // OCHTrajectorySegment
             och = new OCHTrajectorySegment();
+
             // push the new one onto the list at index currSegment
             segments_.push_back(och);
             hasSegmentHadDuplicates.push_back(false);

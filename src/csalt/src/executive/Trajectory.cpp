@@ -2653,6 +2653,14 @@ void Trajectory::WriteToFile(std::string fileName)
       #ifdef DEBUG_WRITE_DATA
       MessageInterface::ShowMessage("--- Processing phase %d\n", (Integer) p);
       #endif
+
+        // Set central body and time system
+        std::string timeSys = phaseList[p]->GetTimeSystem();
+        std::string centralBody = phaseList[p]->GetCentralBody();
+        std::string refFrame = phaseList[p]->GetReferenceFrame();
+        ochData->SetCentralBodyAndRefFrame(p, centralBody, refFrame);
+        ochData->SetTimeSystem(p, timeSys);
+
         // Get the time, state and control data for this phase
         Rvector timeVector = phaseList[p]->GetTimeVector();
         DecisionVector *dv = phaseList[p]->GetDecisionVector();
@@ -2668,6 +2676,12 @@ void Trajectory::WriteToFile(std::string fileName)
         // och data object and the local structure
         stateSol.GetSize(numStateTimes,numStateParams);
         ochData->SetNumStateParams(p,numStateParams);
+
+        // Get the mesh interval fractions and the number of points for each interval
+        Rvector meshIntervalFractions = phaseList[p]->GetMeshIntervalFractions();
+        IntegerArray meshIntervalNumPoints = phaseList[p]->GetMeshIntervalNumPoints();
+        ochData->SetMeshIntervalFractions(p, meshIntervalFractions);
+        ochData->SetMeshIntervalNumPoints(p, meshIntervalNumPoints);
 
         // Loop through each time value
         for (Integer idx = 0; idx < timeVector.GetSize(); idx++)

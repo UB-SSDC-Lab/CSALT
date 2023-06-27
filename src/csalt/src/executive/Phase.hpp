@@ -251,6 +251,16 @@ public:
    virtual void            ReportAllData();
    virtual std::string     ReportHeaderData();
 
+   /// Set maximum polynomial degree increase
+   void SetMaxPolynomialDegreeIncrease(Integer toNum);
+
+   /// Setter and getter methods for meta data
+   void SetTimeSystem(const std::string& timeSys);
+   void SetCentralBody(const std::string& cb);
+   void SetReferenceFrame(const std::string& frame);
+   std::string GetTimeSystem();
+   std::string GetCentralBody();
+   std::string GetReferenceFrame();
 
 protected:
    /// The decision vector - helper class for managing data in dec. vec.
@@ -379,6 +389,15 @@ protected:
 
    ///  Relative error tolerance.  Pass to transUtil Object, Not used by phase
    Real relativeErrorTol;
+
+   /// Maximum allowable increase in the polynomial degree order
+   Integer maxPolyDegIncrease;
+   bool maxPolyDegIncreaseSet;
+
+   /// Phase meta data
+   std::string timeSystem;
+   std::string centralBody;
+   std::string refFrame;
 
 
    void     InitializePathFunctionInputData();

@@ -3,4 +3,6 @@ CsaltLog.txt
 DebrisDeorbitData.txt
 fort.0
 *.o
-application/bin/CSALTTester-R2022a
+*.dylib
+application/bin/CSALTTester*
+application/bin/CSALTApplication*

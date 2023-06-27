@@ -61,6 +61,15 @@ public:
                                           std::string &itsRefFrame);
    virtual void SetTimeSystem(Integer forSegment, std::string newTimeSys);
 
+   /// Access functions for mesh data
+   virtual void SetMeshIntervalFractions(Integer forSegment, Rvector meshIntervalFractions);
+   virtual Rvector GetMeshIntervalFractions(Integer forSegment);
+   virtual void SetMeshIntervalNumPoints(Integer forSegment, IntegerArray SetMeshIntervalNumPoints);
+   virtual IntegerArray GetMeshIntervalNumPoints(Integer forSegment);
+   virtual std::vector<Rvector> GetAllMeshIntervalFractions();
+   virtual std::vector<IntegerArray> GetAllMeshIntervalNumPoints();
+   //virtual std::vector<Rvector> GetAllInitAndFinalTimes();
+
    /// Access functions for exit conditions
    virtual void SetFeasibility(Real feasTol);
    virtual Real GetFeasibility();

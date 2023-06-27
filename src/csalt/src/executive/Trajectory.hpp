@@ -135,8 +135,8 @@ public:
    virtual void                SetTotalIterationsLimit(const IntegerArray &iter);
    virtual void                SetOptimizationMode(const StringArray &optMode);
    virtual void                SetApplicationType(const std::string &appType);
-   virtual void SetSnoptConsoleOutputLevel(const Integer level);
-   virtual Integer GetSnoptConsoleOutputLevel();
+   virtual void                SetSnoptConsoleOutputLevel(const Integer level);
+   virtual Integer             GetSnoptConsoleOutputLevel();
    
    virtual std::string         GetApplicationType();
    virtual ScaleUtility*  	    GetScaleHelper();
@@ -268,10 +268,9 @@ protected:
    /// ==== Helper classes
                      
    /// Optimizer helper class
-
-   SnoptOptimizer           *trajOptimizer;   /// Manager for point function evaluation and partials
+   SnoptOptimizer           *trajOptimizer;   
+   /// Manager for point function evaluation and partials
    UserPointFunctionManager *pointFunctionManager;
-                        
    /// Non-dimensionalizer helper class
    ScaleUtility             *scaleHelper;
    /// which state variable corresponds to each defect constraint

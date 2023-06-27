@@ -260,6 +260,7 @@ void SnoptOptimizer::SetSnoptConsoleOutputLevel(const Integer level)
 		this->Problem.setIntParameter((char*)"Minor print level", 0);
 		this->Problem.setIntParameter((char*)"Print No", 0);
 		this->Problem.setIntParameter((char*)"Summary file", 0);
+      //this->Problem.setIntParameter((char*)"Verify level", 3);
 		this->Problem.setParameter((char*)"Suppress parameters");
 		break;
 	// do nothing if level is anything other than 0

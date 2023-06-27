@@ -459,6 +459,10 @@ void NLPFuncUtilRadau::RefineMesh(DecVecTypeBetts        *ptrDecVector,
          logErrorRatio = log(maxRelErrorInMesh / relErrorTol);
          polynomialDegreeDiff = ceil(logErrorRatio / logNq);
 
+         // TESTING: Enforce max polynomial degree diff
+         if (polynomialDegreeDiff > maxPolyDegDiff)
+            polynomialDegreeDiff = maxPolyDegDiff;
+
          newPolynomialDegree = polynomialDegree + polynomialDegreeDiff;
 
          //  If polynomial degree is ok, accept it, otherwise divide
