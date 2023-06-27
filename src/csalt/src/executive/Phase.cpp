@@ -70,7 +70,9 @@ Phase::Phase() :
    transUtil                   (NULL),
    guessArrayData              (NULL),
    scaleUtil                   (NULL),
-   relativeErrorTol            (1.0e-5)
+   relativeErrorTol            (1.0e-5),
+   maxPolyDegIncrease          (10000),
+   maxPolyDegIncreaseSet       (false)
 {
    // this is specific and should really be set in a child class!!
    decVector             = new DecVecTypeBetts();
@@ -91,6 +93,11 @@ Phase::Phase() :
    SparseMatrixUtil::SetSize(nlpCostJacobian, 1, 1);
    SparseMatrixUtil::SetSize(conSparsityPattern, 1, 1);
    SparseMatrixUtil::SetSize(costSparsityPattern, 1, 1);
+
+   // Initialize meta data
+   timeSystem  = "";
+   centralBody = "";
+   refFrame    = "";
 }
 
 //------------------------------------------------------------------------------
@@ -114,7 +121,12 @@ Phase::Phase(const Phase &copy) :
    recomputeNLPFunctions       (copy.recomputeNLPFunctions),
    isRefining                  (copy.isRefining),
    constraintTimeOffset        (copy.constraintTimeOffset),
-   relativeErrorTol            (copy.relativeErrorTol)
+   relativeErrorTol            (copy.relativeErrorTol),
+   timeSystem                  (copy.timeSystem),
+   centralBody                 (copy.centralBody),
+   refFrame                    (copy.refFrame),
+   maxPolyDegIncrease          (copy.maxPolyDegIncrease),
+   maxPolyDegIncreaseSet       (copy.maxPolyDegIncreaseSet)
 //   dynFunctionProps            (NULL),
 //   costFunctionProps           (NULL),
 //   algFunctionProps            (NULL),
@@ -220,6 +232,11 @@ Phase& Phase::operator=(const Phase &copy)
    isRefining                  = copy.isRefining;
    constraintTimeOffset        = copy.constraintTimeOffset;
    relativeErrorTol            = copy.relativeErrorTol;
+   timeSystem                  = copy.timeSystem;
+   centralBody                 = copy.centralBody;
+   refFrame                    = copy.refFrame;
+   maxPolyDegIncrease          = copy.maxPolyDegIncrease;
+   maxPolyDegIncreaseSet       = copy.maxPolyDegIncreaseSet;
    
    if (pathFunction) delete pathFunction;
    pathFunction   = copy.pathFunction;
@@ -4062,3 +4079,38 @@ void Phase::CopyArrays(const Phase &copy)
    costIntFunctionData = copy.costIntFunctionData; // clone pointers?
 }
 
+void Phase::SetMaxPolynomialDegreeIncrease(Integer toNum)
+{
+   maxPolyDegIncrease = toNum;
+   maxPolyDegIncreaseSet = true;
+}
+
+void Phase::SetTimeSystem(const std::string& timeSys)
+{
+   timeSystem = timeSys;
+}
+
+void Phase::SetCentralBody(const std::string& cb)
+{
+   centralBody = cb;
+}
+
+void Phase::SetReferenceFrame(const std::string& frame)
+{
+   refFrame = frame;
+}
+
+std::string Phase::GetTimeSystem()
+{
+   return timeSystem;
+}
+
+std::string Phase::GetCentralBody()
+{
+   return centralBody;
+}
+
+std::string Phase::GetReferenceFrame()
+{
+   return refFrame;
+}

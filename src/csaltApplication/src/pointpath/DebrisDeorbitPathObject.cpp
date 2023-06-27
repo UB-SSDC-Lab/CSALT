@@ -149,7 +149,7 @@ void DebrisDeorbitPathObject::EvaluateFunctions()
 
 void DebrisDeorbitPathObject::EvaluateJacobians()
 {
-    if (true) {
+    if (true) { // Think the partials are wrong...
     // Compute dynamics partials
     Rmatrix stateDynPartials    = ComputeStateDynamicsPartials();
     Rmatrix controlDynPartials  = ComputeControlDynamicsPartials();

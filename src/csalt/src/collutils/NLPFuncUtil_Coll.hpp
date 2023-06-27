@@ -107,6 +107,7 @@ public:
 
    void SetPhaseNum(Integer inputNum);
    void SetRelativeErrorTol(Real toNum);
+   void SetMaxPolynomialDegreeIncrease(Integer toNum);
 
    // Get methods ==============================================================
    
@@ -141,6 +142,8 @@ public:
    Integer      GetNumTimePoints();
    ///  Returns vector of bools defining discretization point type
    IntegerArray GetTimeVectorType();
+   /// Returns the maximum allowable increase in the polynomial degree
+   Integer     GetMaxPolynomialDegreeIncrease();
 
    // virtual methods ==========================================================
    
@@ -241,6 +244,8 @@ protected:
    /// mesh points size increasement control parameter
    Real     relErrorTol; // default value is 1E-5
 
+   /// Maximum increase in polynomial degree allowed per mesh refinement iteration
+   Integer maxPolyDegDiff;
    
    Integer      quadratureType;
    Rvector      quadratureWeights;

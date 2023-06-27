@@ -34,28 +34,32 @@ public:
    /// destructor
    virtual ~OCHTrajectorySegment(); 
 
-   void        SetCentralBody(std::string s);
-   std::string GetCentralBody();
-   void        SetStartTime(Real t);
-   Real        GetStartTime();
-   void        SetStopTime(Real t);
-   Real        GetStopTime();
-   void        SetUsableStartTime(Real t);
-   Real        GetUsableStartTime();
-   void        SetUsableStopTime(Real t);
-   Real        GetUsableStopTime();
-   void        SetObjectId(std::string id);
-   std::string GetObjectId();
-   void        SetObjectName(std::string nomme);
-   std::string GetObjectName();
-   void        SetRefFrame(std::string s);
-   std::string GetRefFrame();
-   void        SetTimeSystem(std::string s);
-   std::string GetTimeSystem();
-   void        SetHasStartTime(bool b);
-   bool        GetHasStartTime();
-   void        SetHasStopTime(bool b);
-   bool        GetHasStopTime();
+   void         SetCentralBody(std::string s);
+   std::string  GetCentralBody();
+   void         SetStartTime(Real t);
+   Real         GetStartTime();
+   void         SetStopTime(Real t);
+   Real         GetStopTime();
+   void         SetUsableStartTime(Real t);
+   Real         GetUsableStartTime();
+   void         SetUsableStopTime(Real t);
+   Real         GetUsableStopTime();
+   void         SetObjectId(std::string id);
+   std::string  GetObjectId();
+   void         SetObjectName(std::string nomme);
+   std::string  GetObjectName();
+   void         SetRefFrame(std::string s);
+   std::string  GetRefFrame();
+   void         SetTimeSystem(std::string s);
+   std::string  GetTimeSystem();
+   void         SetMeshIntervalFractions(Rvector meshIntFracs);
+   Rvector      GetMeshIntervalFractions();
+   void         SetMeshIntervalNumPoints(IntegerArray meshIntNumPnts);
+   IntegerArray GetMeshIntervalNumPoints();
+   void         SetHasStartTime(bool b);
+   bool         GetHasStartTime();
+   void         SetHasStopTime(bool b);
+   bool         GetHasStopTime();
 
 
 protected:
@@ -78,6 +82,10 @@ protected:
    std::string refFrame;
    /// the time system
    std::string timeSystem;
+   /// The mesh interval fractions
+   Rvector meshIntervalFractions;
+   /// The mesh interval number of points
+   IntegerArray meshIntervalNumPoints;
    /// indicates if the segment has a start time
    bool        hasStartTime;
    /// indicates if the segment has a stop time

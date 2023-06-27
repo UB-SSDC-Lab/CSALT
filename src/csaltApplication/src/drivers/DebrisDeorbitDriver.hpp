@@ -23,6 +23,7 @@ protected:
     Integer maxMeshRefinements;
     Integer maxMajorIterations;
     Integer maxTotalIterations;
+    Integer maxPolyDegIncrease;
     Real majorOptimalityTol;
     Real feasibilityTol;
     Real meshRelTol;

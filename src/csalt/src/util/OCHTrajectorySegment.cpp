@@ -187,6 +187,26 @@ std::string OCHTrajectorySegment::GetTimeSystem()
    return timeSystem;
 };
 
+void OCHTrajectorySegment::SetMeshIntervalFractions(Rvector meshIntFracs)
+{
+   meshIntervalFractions = meshIntFracs;
+}
+
+Rvector OCHTrajectorySegment::GetMeshIntervalFractions()
+{
+   return meshIntervalFractions;
+}
+
+void OCHTrajectorySegment::SetMeshIntervalNumPoints(IntegerArray meshIntNumPnts)
+{
+   meshIntervalNumPoints = meshIntNumPnts;
+}
+
+IntegerArray OCHTrajectorySegment::GetMeshIntervalNumPoints()
+{
+   return meshIntervalNumPoints;
+}
+
 void OCHTrajectorySegment::SetHasStartTime(bool b)
 {
    hasStartTime = b;

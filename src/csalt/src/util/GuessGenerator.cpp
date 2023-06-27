@@ -326,8 +326,8 @@ void GuessGenerator::ComputeGuessFromOCHFile(const std::string &OCHFileName,
     guessData->SetAllowInterSegmentExtrapolation(true);
     guessData->SetAllowExtrapolation(true);
 
-    std::vector<TrajectoryDataStructure> interpGuessData =
-                                         guessData->Interpolate(requestedTimes);
+    std::vector<TrajectoryDataStructure> interpGuessData = 
+      guessData->Interpolate(requestedTimes);
 
     stateMat.SetSize(numStatePoints, numStates);
     for (Integer idx = 0; idx < numStatePoints; idx++)

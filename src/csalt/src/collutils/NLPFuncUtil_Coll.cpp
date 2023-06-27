@@ -51,7 +51,8 @@ NLPFuncUtil_Coll::NLPFuncUtil_Coll() :
    ptrConfig                     (NULL),
    isFinalized                   (false),
    isConMatInitialized           (false),
-   isCostMatInitialized          (false)
+   isCostMatInitialized          (false),
+   maxPolyDegDiff                (10000)
 {
    
 }
@@ -83,7 +84,8 @@ NLPFuncUtil_Coll::NLPFuncUtil_Coll(const NLPFuncUtil_Coll &col) :
    ptrConfig                     (col.ptrConfig),
    isFinalized                   (col.isFinalized),
    isConMatInitialized           (col.isConMatInitialized),
-   isCostMatInitialized          (col.isCostMatInitialized)
+   isCostMatInitialized          (col.isCostMatInitialized),
+   maxPolyDegDiff                (col.maxPolyDegDiff)
 {
    // ==== Data defining dimensions of transcription properties
         
@@ -164,6 +166,7 @@ NLPFuncUtil_Coll&   NLPFuncUtil_Coll::operator=(const NLPFuncUtil_Coll &col)
    isFinalized                    = col.isFinalized;
    isConMatInitialized            = col.isConMatInitialized;
    isCostMatInitialized           = col.isCostMatInitialized;
+   maxPolyDegDiff                 = col.maxPolyDegDiff;
    
    // NOTE: we could make a CopyData method that both the copy constructor and
    // operator= could call to do all this
@@ -556,6 +559,33 @@ void NLPFuncUtil_Coll::SetPhaseNum(Integer inputNum)
 void NLPFuncUtil_Coll::SetRelativeErrorTol(Real toNum)
 {
    relErrorTol = toNum;  // @todo add validation here
+}
+
+//------------------------------------------------------------------------------
+// SetMaxPolynomialDegreeIncrease(Integer toNum)
+//------------------------------------------------------------------------------
+/**
+ * Sets the maximum polynomial degree increase allowed during mesh refinement
+ *
+ * @param <toNum> the maximum increase in polynomial degree
+ */
+//------------------------------------------------------------------------------
+void NLPFuncUtil_Coll::SetMaxPolynomialDegreeIncrease(Integer toNum)
+{
+   maxPolyDegDiff = toNum;
+}
+
+//------------------------------------------------------------------------------
+// Integer GetMaxPolynomialDegreeIncrease()
+//------------------------------------------------------------------------------
+/**
+ * Gets the maximum polynomial degree increase allowed during mesh refinement
+ * 
+ */
+//------------------------------------------------------------------------------
+Integer NLPFuncUtil_Coll::GetMaxPolynomialDegreeIncrease()
+{
+   return maxPolyDegDiff;
 }
 
 //------------------------------------------------------------------------------

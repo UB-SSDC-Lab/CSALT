@@ -60,7 +60,7 @@ void DebrisDeorbitPointObject::EvaluateFunctions()
     SetFunctionBounds(ALGEBRAIC, UPPER, algF_U);
 
     // Set cost function
-    Rvector costFunc(1, tf);
+    Rvector costFunc(1, tf / 3600.0);
     SetFunctions(COST, costFunc);
 }
 

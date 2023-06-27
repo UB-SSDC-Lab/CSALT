@@ -249,6 +249,11 @@ void DebrisDeorbitDriver::SetupPhases()
     // Set guess mode
     std::string initialGuessMode    = "OCHFile";
 
+    // Set phase properties
+    std::string timeSystem          = "A1ModJulian";
+    std::string centralBody         = "399";
+    std::string refFrame            = "MJ2000Eq";
+
     // Set mesh properties
     Rvector meshIntervalFractions;
     IntegerArray meshIntervalNumPoints;
@@ -271,7 +276,11 @@ void DebrisDeorbitDriver::SetupPhases()
     }
 
     // Set phase properties 
+    phase1->SetTimeSystem(timeSystem);
+    phase1->SetCentralBody(centralBody);
+    phase1->SetReferenceFrame(refFrame);
     phase1->SetRelativeErrorTol(meshRelTol);
+    phase1->SetMaxPolynomialDegreeIncrease(maxPolyDegIncrease);
     phase1->SetInitialGuessMode(initialGuessMode);
     phase1->SetGuessFileName(ochFile);
     phase1->SetNumStateVars(8);
@@ -339,6 +348,8 @@ void DebrisDeorbitDriver::ProcessInputFile()
                         maxMajorIterations = std::stoi(val);
                     else if (key.find("MAX_TOTAL_ITERATIONS") != std::string::npos)
                         maxTotalIterations = std::stoi(val);
+                    else if (key.find("MAX_POLY_DEG_INCREASE") != std::string::npos)
+                        maxPolyDegIncrease = std::stoi(val);
                     else if (key.find("MAJOR_OPTIMALITY_TOL") != std::string::npos)
                         majorOptimalityTol = std::stod(val);
                     else if (key.find("FEASIBILITY_TOL") != std::string::npos)
