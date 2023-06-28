@@ -301,6 +301,33 @@ bool OCHTrajectoryData::AllMeshDataSet()
 }
 
 //------------------------------------------------------------------------------
+// bool AllMeshDataRadau()
+//------------------------------------------------------------------------------
+bool OCHTrajectoryData::AllMeshDataRadau()
+{
+   // Check that mesh has been set for all segments
+   bool flag = AllMeshDataSet();
+
+   // If mesh is set for all segments, check if 
+   // initial and final mesh interval fractions
+   // are -1 and 1 respectively for all segments
+   Real tol = 5e-14;
+   if (flag) {
+      for (Integer i = 0; i < numSegments; i++) {
+         Rvector meshIntervalFracs = GetMeshIntervalFractions(i);
+         Integer n = meshIntervalFracs.GetSize();
+         if (!(GmatMathUtil::Abs(meshIntervalFracs(0) + 1.0) < tol &&
+               GmatMathUtil::Abs(meshIntervalFracs(n - 1) - 1.0) < tol)) {
+            flag = false; 
+            break;
+         }
+      }
+   }
+
+   return flag;
+}
+
+//------------------------------------------------------------------------------
 // void SetFeasibility(Real feas)
 //------------------------------------------------------------------------------
 /**
@@ -1293,7 +1320,7 @@ void OCHTrajectoryData::ReadFromFile(std::string fileName)
 *
 */
 //------------------------------------------------------------------------------
-std::vector<TrajectoryDataStructure> OCHTrajectoryData::Interpolate(
+std::vector<TrajectoryDataStructure> OCHTrajectoryData::InterpolateRadauMesh(
                                      Rvector requestedTimes, DataType type)
 {
    #ifdef DEBUG_INTERPOLATE
@@ -1302,16 +1329,20 @@ std::vector<TrajectoryDataStructure> OCHTrajectoryData::Interpolate(
       MessageInterface::ShowMessage("size of requestedTimes = %d\n",
                                     requestedTimes.GetSize());
    #endif
+
+   // Ensure interpolator is set to Lagrange
+   SetInterpType(TrajectoryData::LAGRANGE);
    
+   // Update the interpolator
    UpdateInterpolator();
 
-   #ifdef DEBUG_INTERPOLATE
-      MessageInterface::ShowMessage("---> Interpolator updated\n");
-   #endif
-
+   // Instantiate vector of TrajectoryDataStructures for output
    std::vector<TrajectoryDataStructure> output;
+
+   // Create local TrajectoryDataStructure for storing temporary data
    TrajectoryDataStructure localData;
 
+   // Set size to zero. Likely not necessary?
    localData.states.SetSize(0);
    localData.controls.SetSize(0);
    localData.integrals.SetSize(0);
@@ -1322,8 +1353,7 @@ std::vector<TrajectoryDataStructure> OCHTrajectoryData::Interpolate(
 
    for (Integer s = 1; s < numSegments; s++)
    {
-      segTimes[0] = segments_.at(s-1)->GetTime(segments_.at(s-1)->
-                    GetNumDataPoints()-1);
+      segTimes[0] = segments_.at(s-1)->GetTime(segments_.at(s-1)->GetNumDataPoints()-1);
       segTimes[1] = segments_.at(s)->GetTime(0);
       relT = segTimes[0] - segTimes[1];
       if (fabs(segTimes[0]) > 0.1)
@@ -1348,11 +1378,6 @@ std::vector<TrajectoryDataStructure> OCHTrajectoryData::Interpolate(
    for (Integer idx = 0; idx < requestedTimes.GetSize(); idx++)
    {
       Integer currentSegment = GetRelevantSegment(requestedTimes(idx));
-      #ifdef DEBUG_INTERPOLATE
-         MessageInterface::ShowMessage(
-            "---> relevant segment retrieved for index %d at time %12.10f\n",
-            idx, requestedTimes(idx));
-      #endif
 
       // start with empty arrays each time
       localData.states.SetSize(0);
@@ -1366,8 +1391,7 @@ std::vector<TrajectoryDataStructure> OCHTrajectoryData::Interpolate(
          localData.states.SetSize(segments_.at(currentSegment)->GetNumStates());
          for (Integer jdx = 0; jdx < segments_.at(currentSegment)->GetNumStates(); jdx++)
          {
-            UpdateInterpPoints(currentSegment,requestedTimes(idx),
-                                STATE,jdx);
+            UpdateRadauInterpPoints(currentSegment, requestedTimes(idx), STATE, jdx);
 
             if (duplicateTimeFound)
             {
@@ -1376,8 +1400,7 @@ std::vector<TrajectoryDataStructure> OCHTrajectoryData::Interpolate(
                break;
             }
 
-            success = interpolator->Interpolate(requestedTimes(idx),
-               &localData.states(jdx));
+            success = interpolator->Interpolate(requestedTimes(idx), &localData.states(jdx));
             if (!success)
             {
                throw LowThrustException("ERROR - TrajectoryData: "
@@ -1531,4 +1554,317 @@ std::vector<TrajectoryDataStructure> OCHTrajectoryData::Interpolate(
     }
 
     return output;
+}
+
+//------------------------------------------------------------------------------
+// void UpdateRadauInterpPoints(Integer segment, Real requestedTime, DataType type,
+//                         Integer dataIdx)
+//------------------------------------------------------------------------------
+/**
+* This method updates the data points held by the interpolator
+*
+* @param <currSegment>   the current segment
+* @param <requestedTime> the time for which data is requested
+* @param <type>          the data type
+* @param <dataIdx>       the data index
+*/
+//------------------------------------------------------------------------------
+void OCHTrajectoryData::UpdateRadauInterpPoints(Integer currSegment, Real requestedTime,
+                                                DataType type, Integer dataIdx)
+{
+   // Reset the interpolator first
+   interpolator->Clear();
+   interpolator->SetExtrapolation(false);
+
+   // Get the mesh properties
+   Rvector meshIntervalFractions = GetMeshIntervalFractions(currSegment);
+   IntegerArray meshIntervalNumPoints = GetMeshIntervalNumPoints(currSegment);
+
+   // Interpolating Radau mesh, so this is not necessary !!!!
+   // Keeping for now to avoid bugs...
+   Integer nPoints = segments_.at(currSegment)->GetNumDataPoints();
+
+   // Create a vector of indices of data that will be added to the interpolator
+   Rvector indicesToAdd;
+
+   // If there are fewer data points than the nominally requested
+   // interpolation data points, reset the holder variable
+   Integer interpPointsLocal = interpPoints > nPoints ? nPoints : interpPoints; // Think interp points local is the number of points used in polynomial
+                                                                                // If this is true, should be set to the number of points for the relevant
+                                                                                // mesh interval (i.e., from meshIntervalNumPoints)
+   // Size the vector with how many points we are going to add
+   indicesToAdd.SetSize(interpPointsLocal);
+
+   // ==== NOTES FOR MODIFICATION
+   //    The following for loop sets the elements of `indicesToAdd` to the indecies of the 
+   //    relevant OCH data term which we want to include in data given to the interpolator
+   //
+   //    We went to set these indicies to those corresponding to the relevant mesh
+   //    interval.
+   // ===========================
+
+   // Double check if we need to extrapolate on the low side for this time
+   if (requestedTime < segments_.at(currSegment)->GetTime(0))
+   {
+      if ((currSegment > 0 && allowInterSegmentExtrapolation) ||
+          (currSegment == 0 && allowExtrapolation))
+      {
+         // We do. Set the interpolator's flag
+         interpolator->SetExtrapolation(true);
+
+         // Add the first points
+         for (Integer idx = 0; idx < interpPointsLocal; idx++)
+             indicesToAdd(idx) = idx;
+      }
+      else
+         throw LowThrustException("ERROR - TrajectoryData: requested time"
+                 " is outside of segment and extrapolation is not allowed.");    
+   }
+   // Double check if we need to extrapolate on the high side for this time
+   else if (requestedTime > segments_.at(currSegment)->GetTime(nPoints-1))
+   {
+      if ((currSegment < numSegments-1 && allowInterSegmentExtrapolation) ||
+          (currSegment == numSegments-1 && allowExtrapolation))
+      {
+         // We do. Set the interpolator's flag
+         interpolator->SetExtrapolation(true);
+
+         // Add the final points
+         Integer startIndex = 0;
+         for (Integer idx = nPoints-interpPointsLocal; idx < nPoints; idx++)
+         {
+             indicesToAdd(startIndex) = idx;
+             startIndex++;
+         }
+      }
+      else
+         throw LowThrustException("ERROR - TrajectoryData: requested time"
+                 " is outside of segment and extrapolation is not allowed."); 
+   }
+   else
+   {
+      // First we will loop to find the closest value in the data array.
+      // This assumes that the data is monotonically increasing. A check was
+      // done earlier.
+
+      // Create some helper variables
+      Integer closestIndex = -1; // Index of the closest value
+      Real currentDistance = 0; // Time distance from the current data point
+      Real lastDistance = fabs(
+                       requestedTime - segments_.at(currSegment)->GetTime(0));
+            // Time distance from the last data point
+
+      // Loop through each time value in the known data set. Starting with the
+      // second data point
+      for (Integer idx = 1; idx < nPoints; idx++)
+      {
+         // Update the current distance
+         currentDistance = fabs(
+                   requestedTime - segments_.at(currSegment)->GetTime(idx));
+
+         // If the current distance is greater than the last distance, we are
+         // moving further from the the data point, so we found the
+         // data point
+         if (currentDistance >= lastDistance)
+         {
+             // Set the index and finish the loop
+             closestIndex = idx - 1;
+             break;
+         }
+         // We didnt find the data point yet, so continue looping after
+         // resetting the tracker distance
+         lastDistance = currentDistance;
+      }
+
+      // If a closest index wasnt found, the final data value must be
+      // the closest
+      if (closestIndex == -1)
+         closestIndex = nPoints - 1;
+
+      // Now we need to add indices for the closest points surrounding the
+      // closest point itself
+
+      // First declare some helper variables
+      Integer startIndex, delta0, delta;
+
+      // Check if we are on the left or right side of the closest point
+      if (requestedTime >= segments_.at(currSegment)->GetTime(closestIndex))
+      {
+         // The requested time is on the right. The index of first point
+         // to add will be one greater than the initial point
+         startIndex = Integer(floor(float(interpPointsLocal-1)/2));
+         delta0 = delta = 1;
+      }
+      else
+      {
+         // The requested time is on the left. The first point to add will
+         // also be one lesser than the initial point
+         startIndex = Integer(ceil(float(interpPointsLocal-1)/2));
+         delta0 = delta = -1;
+      }
+
+      // Check if we have enough points on the left side of the closest point
+      if (closestIndex + delta * ceil(float(interpPointsLocal-1)/2) < 0 ||
+          closestIndex - delta * floor(float(interpPointsLocal-1)/2) < 0)
+      {
+         // We do not. Add the first points
+         for (Integer idx = 0; idx < interpPointsLocal; idx++)
+         {
+            indicesToAdd(idx) = idx;
+         }
+      }
+      // Check if we have enough points on the right side of the closest point
+      else if (closestIndex + delta * ceil(float(interpPointsLocal-1)/2) >=
+              nPoints || closestIndex - delta *
+              floor(float(interpPointsLocal-1)/2) >= nPoints)
+      {
+         // We do not. Add the final points
+         startIndex = 0;
+         for (Integer idx = nPoints-interpPointsLocal; idx < nPoints; idx++)
+         {
+            indicesToAdd(startIndex) = idx;
+            startIndex++;
+         }
+      }
+      else
+      {
+         // Start by adding the closest point
+         indicesToAdd(startIndex) = closestIndex;
+
+         // Loop through and add as many points as neceessary (interpPoints)
+         for (Integer idx = 0; idx < interpPointsLocal - 1; idx++)
+         {
+            indicesToAdd(startIndex+delta) = closestIndex + delta;
+
+            // Flip the sign of delta, so that we add a point on the other
+            // side of the closest point next
+            delta *= -1;
+
+            // Increase the magnitude of delta if we are back to the
+            // original side of the closest point
+            if (float(idx+1)/2 == floor((idx+1)/2)) delta += delta0;
+         }
+      }
+   }
+
+   // ==== END NOTES FOR MODIFICATION
+   // ===========================
+
+   // Loop through the indices of the points to add and make sure that data
+   // exists in all of them
+   std::vector<Integer> badIdxs;
+   for (Integer idx = 0; idx < interpPointsLocal; idx++)
+   {
+      switch (type)
+      {
+         case (STATE):
+             if (!segments_.at(currSegment)->GetStateSize(indicesToAdd(idx)))
+                 badIdxs.push_back(idx);
+             break;
+         case (CONTROL):
+             if (!segments_.at(currSegment)->GetControlSize(
+                                             indicesToAdd(idx)))
+                 badIdxs.push_back(idx);
+             break;
+         case (INTEGRAL):
+             if (!segments_.at(currSegment)->GetIntegralSize(
+                                             indicesToAdd(idx)))
+                 badIdxs.push_back(idx);
+             break;
+         case (ALL):
+             throw LowThrustException(
+                     "ERROR - TrajectoryData: ALL data type not"
+                     " possible here.");
+             break;
+      }
+   }
+   if (badIdxs.size() > 1)
+         throw LowThrustException(
+                 "ERROR - TrajectoryData: Data not present in multiple"
+                 " places needed for interpolation.");
+   if (badIdxs.size() == 1)
+   {
+      if (badIdxs[0] == interpPointsLocal-1)
+      {
+         if (indicesToAdd(interpPointsLocal-1) == nPoints-1 &&
+             allowExtrapolation)
+         {
+            interpolator->SetExtrapolation(true);
+         }
+
+         for (Integer idx = 0; idx < interpPointsLocal; idx++)
+            indicesToAdd(idx) -= 1;
+                     
+         if (indicesToAdd(0) < 0)
+            throw LowThrustException(
+                 "ERROR - TrajectoryData: Data not present where"
+                 " needed for interpolation.");
+      }
+      else
+         throw LowThrustException(
+             "ERROR - TrajectoryData: Data not present where"
+             " needed for interpolation.");
+   }
+
+   // Add interpolation data times to vector
+   RealArray timesToAdd;
+   for (Integer idx = 0; idx < interpPointsLocal; idx++)
+   {
+      timesToAdd.push_back(segments_.at(currSegment)->GetTime(indicesToAdd(idx)));
+   }
+
+   // Check if there are any duplicate times trying to be used for 
+   // interpolation coefficients
+
+   // ==== NOTES FOR MODIFICATION
+   // Modifying the following section to instead throw an
+   // error when duplicate times are found. Refer back to 
+   // TrajectoryData::UpdateInterpPoints() for the previous 
+   // version of the code.
+   // ===========================
+
+   for (Integer idx = 0; idx < interpPointsLocal; idx++)
+   {
+      for (Integer idx2 = idx + 1; idx2 < interpPointsLocal; idx2++)
+      {
+         if (timesToAdd.at(idx) == timesToAdd.at(idx2))
+         {
+            duplicateTimeFound = true;
+
+            std::string errMsg = "ERROR - OCHTrajectoryData: ";
+            errMsg += "Identical time values detected when ";
+            errMsg += "creating interpolator coefficients in phase %d.  ";
+            errMsg += "Interpolation cannot be completed.\n";
+            throw LowThrustException(errMsg);
+         }
+      }
+   }
+
+   // ==== END NOTES FOR MODIFICATION
+   // ===============================
+
+   // Finally, loop through the indices of the points to add, and add the data
+   // values to the interpolator
+   for (Integer idx = 0; idx < interpPointsLocal; idx++)
+   {
+      Real val;
+      switch (type)
+      {
+         case (STATE):
+            val = segments_.at(currSegment)->GetState(indicesToAdd(idx), dataIdx);
+            break;
+         case (CONTROL):
+            val = segments_.at(currSegment)->GetControl(indicesToAdd(idx), dataIdx);
+            break;
+         case (INTEGRAL):
+            val = segments_.at(currSegment)->GetIntegral(indicesToAdd(idx), dataIdx);
+            break;
+         case (ALL):
+            throw LowThrustException(
+                     "ERROR - TrajectoryData: ALL data type not"
+                     " possible here.");
+            break;
+      }
+      interpolator->AddPoint(segments_.at(currSegment)->GetTime(indicesToAdd(idx)), &val);
+   }
 }

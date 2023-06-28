@@ -323,17 +323,25 @@ void GuessGenerator::ComputeGuessFromOCHFile(const std::string &OCHFileName,
     // Instantiate OCH data object and read OCH file
     OCHTrajectoryData* guessData = new OCHTrajectoryData(OCHFileName);
 
-    // Check if we have mesh data
-    if (guessData->AllMeshDataSet()) {
+    // Check if we have radau mesh data
+    bool using_radau_mesh = guessData->AllMeshDataRadau();
 
-    }
+   // Set interpolation type
+   if (using_radau_mesh)
+      guessData->SetInterpType(TrajectoryData::LAGRANGE);
+   else
+      guessData->SetInterpType(TrajectoryData::NOTAKNOT);
 
-    guessData->SetInterpType(TrajectoryData::NOTAKNOT);
+    // Set extrapolation options
     guessData->SetAllowInterSegmentExtrapolation(true);
     guessData->SetAllowExtrapolation(true);
 
-    std::vector<TrajectoryDataStructure> interpGuessData = 
-      guessData->Interpolate(requestedTimes);
+    // Interpolate to generate guess
+    std::vector<TrajectoryDataStructure> interpGuessData;
+    if (using_radau_mesh)
+      interpGuessData = guessData->InterpolateRadauMesh(requestedTimes);
+    else
+      interpGuessData = guessData->Interpolate(requestedTimes);
 
     stateMat.SetSize(numStatePoints, numStates);
     for (Integer idx = 0; idx < numStatePoints; idx++)

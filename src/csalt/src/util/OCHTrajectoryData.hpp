@@ -69,6 +69,7 @@ public:
    virtual std::vector<Rvector> GetAllMeshIntervalFractions();
    virtual std::vector<IntegerArray> GetAllMeshIntervalNumPoints();
    virtual bool AllMeshDataSet();
+   virtual bool AllMeshDataRadau();
    //virtual std::vector<Rvector> GetAllInitAndFinalTimes();
 
    /// Access functions for exit conditions
@@ -88,13 +89,16 @@ public:
    virtual void SetSolutionType(std::string);
    virtual std::string GetSolutionType();
 
+   // Interpolate on Radau mesh grid
    virtual std::vector<TrajectoryDataStructure>
-                             Interpolate(Rvector  requestedTimes,
-                                       DataType type = ALL);
+      InterpolateRadauMesh(Rvector  requestedTimes, DataType type = ALL);
 
 protected:
 
    virtual Real ProcessTimeString(std::string input, std::string timeSystem);
+
+   void UpdateRadauInterpPoints(Integer currSegment, Real requestedTime, 
+                                DataType type, Integer dataIdx);
 
    /// Boolean determining whether or not the DATA section of the och file 
    /// was found

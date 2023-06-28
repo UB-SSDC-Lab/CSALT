@@ -5,6 +5,7 @@
 #include "DebrisDeorbitInitialStateConstraint.hpp"
 #include "DebrisDeorbitFinalStateConstraint.hpp"
 
+#include <sys/stat.h>
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -305,14 +306,23 @@ void DebrisDeorbitDriver::ProcessInputFile()
     // Instantiate file stream
     std::ifstream infile(inputFile);
 
+    // Check that file exists
+    if (!infile.good()) {
+        std::string errorMsg = "ERROR - DebrisDeorbitDriver: ";
+        errorMsg += "The input file: \"" + inputFile + "\" does ";
+        errorMsg += "not exist.\n";
+        throw LowThrustException(errorMsg);
+    }
+
     // Loop through file line by line
     InputFileLocation loc = NS;
     std::string line, key, val;
     while (std::getline(infile, line))
     {
         if (loc == NS) { // Not in section currently, see if we're entering a section
-            if (line.find("META_START") != std::string::npos)
+            if (line.find("META_START") != std::string::npos) {
                 loc = META;
+            }
             else if (line.find("GUESS_START") != std::string::npos)
                 loc = GUESS;
             else if (line.find("PARAMETERS_START") != std::string::npos)
