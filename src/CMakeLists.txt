@@ -45,6 +45,12 @@ if (GMAT_INCLUDE_CSALT)
       GET_DIRECTORY_PROPERTY(tmp DIRECTORY ${SRCDIR} DEFINITION TargetName)
       SET(SrcTargets ${SrcTargets} ${tmp})
    endif()
+   if(GMAT_INCLUDE_CSALT_WITH_JULIA_PROGRAM)
+      SET(SRCDIR "csaltApplicationWithJulia")
+      ADD_SUBDIRECTORY(${SRCDIR})
+      GET_DIRECTORY_PROPERTY(tmp DIRECTORY ${SRCDIR} DEFINITION TargetName)
+      SET(SrcTargets ${SrcTargets} ${tmp})
+   endif()
 endif()
 
 # ====================================================================
