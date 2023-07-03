@@ -1,6 +1,20 @@
 
+# Helper function for geting quadrature weights
+function fill_gausslegendre!(τs,ws,n)
+    τso, wso = gausslegendre(n)
+    τs .= τso
+    ws .= wso
+    return nothing
+end
+
 # Averaged equations of motion with the reduced averaged state vector (no true longitude) 
-function averaged_reduced_state_dynamics(p, f, g, h, k, m, t, δ, α1, α2, α3, μ, tMax, Isp, g0, τs, ws)
+function averaged_reduced_state_dynamics!(dx, x, t, δ, α1, α2, α3, μ, tMax, Isp, g0, τs, ws)
+    # Grab states
+    p,f,g,h,k,m = x
+    display(x)
+    # Put thrust directions in SVector
+    α = SVector(α1,α2,α3)
+
     # Compute orbital period for current osculating orbit
     a   = p / (1.0 - f*f - g*g) 
     T0  = 2.0*π*sqrt(a*a*a / μ)
@@ -40,8 +54,14 @@ function averaged_reduced_state_dynamics(p, f, g, h, k, m, t, δ, α1, α2, α3,
     # Compute mass dynamics
     dmdt = -tMax*δ / (Isp * g0)
 
-    # Return averaged dynamics
-    return pin, fin, gin, hin, kin, dmdt
+    # Set averaged dynamics
+    dx[1] = pin
+    dx[2] = fin 
+    dx[3] = gin 
+    dx[4] = hin
+    dx[5] = kin 
+    dx[6] = dmdt
+    return nothing
 end
 
 # averaged_reduced_state_dynamics_ptr() = @cfunction(averaged_reduced_state_dynamics,

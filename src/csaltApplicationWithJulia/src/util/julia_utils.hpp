@@ -19,6 +19,7 @@ void stop_julia(int n);
 // Exception handling
 void handle_julia_exception(void);
 jl_value_t* handle_eval_string(const char* code);
+jl_value_t* handle_jl_call(jl_function_t* f, jl_value_t** args, uint32_t nargs);
 
 // Vectors and matricies
 class JLvector 
@@ -41,6 +42,9 @@ public:
     void MakeZeroVector();
 
 protected:
+    // Array type
+    jl_value_t* type;
+
     // Pointer to Julia vector
     jl_array_t* vecptr;
 
