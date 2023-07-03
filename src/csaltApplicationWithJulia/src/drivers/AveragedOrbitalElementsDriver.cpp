@@ -1,5 +1,7 @@
 
 #include "AveragedOrbitalElementsDriver.hpp"
+#include "AveragedOrbitalElementsPathObject.hpp"
+#include "AveragedOrbitalElementsPointObject.hpp"
 
 AveragedOrbitalElementsDriver::AveragedOrbitalElementsDriver() : 
     CsaltDriver("AveragedOrbitalElements")
@@ -32,7 +34,7 @@ void AveragedOrbitalElementsDriver::SetParameters()
     tMax    = 2.0*eta*P / (g0 * Isp);
 
     // Set number of points use in Gauss quadrature
-    n       = 10;
+    n       = 100;
 
     // Set initial state vector constraint
     x0_con.SetSize(6);
@@ -60,10 +62,96 @@ void AveragedOrbitalElementsDriver::SetParameters()
 
 void AveragedOrbitalElementsDriver::SetPointPathAndProperties()
 {
+    // Instantiate point and path objects
+    pathObject  = new AveragedOrbitalElementsPathObject(n);
+    pointObject = new AveragedOrbitalElementsPointObject();
 
+    // Set path object properties
+    dynamic_cast<AveragedOrbitalElementsPathObject*>(pathObject)->SetGravitationalParameter(mu);
+    dynamic_cast<AveragedOrbitalElementsPathObject*>(pathObject)->SetThrustParameters(tMax, Isp, g0);
+
+    // Set point object properties
+    dynamic_cast<AveragedOrbitalElementsPointObject*>(pointObject)->SetInitialStateConstraint(x0_con);
+    dynamic_cast<AveragedOrbitalElementsPointObject*>(pointObject)->SetFinalStateConstraint(xf_con);
+
+    // Set properties
+    maxMeshRefinementCount      = 20;
+    majorIterationsLimits[0]    = 500;
+    totalIterationsLimits[0]    = 300000;
+    optimizationMode            = StringArray(1, "Minimize");
+
+    majorOptimalityTolerances.SetSize(1);
+    feasibilityTolerances.SetSize(1);
+    majorOptimalityTolerances(0)    = 1e-5;
+    feasibilityTolerances(0)        = 1e-5;
 }
 
 void AveragedOrbitalElementsDriver::SetupPhases()
 {
+    // Instantiate LGR phase
+    RadauPhase *phase   = new RadauPhase();
 
+    // Set guess mode 
+    std::string initialGuessMode    = "LinearNoControl";
+
+    // Set bounds
+    Rvector state_LB(6);
+    Rvector state_UB(6);
+    for (Integer i = 0; i < 6; i++) {
+        state_LB(i) = -INF;
+        state_UB(i) = INF;
+    }
+
+    Rvector control_LB(4);
+    Rvector control_UB(4);
+    control_LB(0) = 0.0;
+    control_UB(0) = 1.0;
+    for (Integer i = 1; i < 4; i++) {
+        control_LB(i) = -1.0;
+        control_UB(i) = 1.0;
+    }
+
+    Real time_LB = 0.0;
+    Real time_UB = INF;
+
+    // Set mesh properties
+    Integer N, M;
+    N = 10;
+    M = 10;
+    Real step = 2.0 / (N - 1.0);
+    Rvector meshIntervalFractions(N);
+    IntegerArray meshIntervalNumPoints;
+    for (Integer i = 0; i < N - 1; i++) {
+        meshIntervalFractions[i] = -1.0 + step*i;
+        meshIntervalNumPoints.push_back(M);
+    }
+    meshIntervalFractions[N - 1] = 1.0;
+
+    // Set initial and final guess for state
+    Rvector x0_guess(6), xf_guess(6);
+    for (Integer i = 0; i < 6; i++) {
+        x0_guess(i) = x0_con(i);
+        if (i != 5)
+            xf_guess(i) = xf_con(i);
+    }
+    xf_guess(5) = 0.9*x0_guess(5);
+
+    // Set phase properties
+    phase->SetRelativeErrorTol(1e-5);
+    phase->SetInitialGuessMode(initialGuessMode);
+    phase->SetNumStateVars(6);
+    phase->SetNumControlVars(4);
+    phase->SetMeshIntervalFractions(meshIntervalFractions);
+    phase->SetMeshIntervalNumPoints(meshIntervalNumPoints);
+    phase->SetStateLowerBound(state_LB);
+    phase->SetStateUpperBound(state_UB);
+    phase->SetStateInitialGuess(x0_guess);
+    phase->SetStateFinalGuess(xf_guess);
+    phase->SetControlLowerBound(control_LB);
+    phase->SetControlUpperBound(control_UB);
+    phase->SetTimeLowerBound(0.0);
+    phase->SetTimeUpperBound(time_UB);
+    phase->SetTimeInitialGuess(0.0);
+    phase->SetTimeFinalGuess(120.0*86400.0/TU);
+    phaseList.push_back(phase);
 }

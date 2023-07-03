@@ -65,6 +65,12 @@ jl_value_t* handle_eval_string(const char* code) {
     return result;
 }
 
+jl_value_t* handle_jl_call(jl_function_t* f, jl_value_t** args, uint32_t nargs) {
+    jl_value_t* result = jl_call(f, args, nargs);
+    handle_julia_exception();
+    return result;
+}
+
 // ======================================
 // JLvector
 // ======================================
@@ -72,7 +78,7 @@ jl_value_t* handle_eval_string(const char* code) {
 JLvector::JLvector(size_t n) : n(n)
 {
     // Get array type
-    jl_value_t* type = jl_apply_array_type((jl_value_t*) jl_float64_type, 1);
+    type = jl_apply_array_type((jl_value_t*) jl_float64_type, 1);
 
     // Allocate vector
     vecptr = jl_alloc_array_1d(type, n);

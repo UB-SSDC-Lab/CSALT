@@ -6,6 +6,25 @@ int main(int argc, char *argv[])
     // Setup Julia
     setup_julia();
 
+    // Run CSALT with julia
+    try {
+        int ret = unsafe_main(argc, argv);
+        return ret;
+    }
+    catch(const LowThrustException& e)
+    {
+        // Stop Julia 
+        stop_julia(1);
+        throw e;
+        return 1; // Don't thing return is necessary when throwing exception
+    } 
+}
+
+int unsafe_main(int argc, char *argv[])
+{
+    // Setup Julia
+    setup_julia();
+
     // Instantiate some requirements
     std::string msg;
     std::string prob;
@@ -64,6 +83,7 @@ int main(int argc, char *argv[])
 				msg += "Currently, the following problems are \n";
 				msg += "available:\n";
 				msg += "   1.  DebrisDeorbit\n";
+                msg += "   2.  AveragedOrbitalElements";
 				msg += "\n";
 
                 msg += "[-i | --input]: Set input file for problem.\n";
@@ -84,10 +104,12 @@ int main(int argc, char *argv[])
         msg += "********************************************\n\n";
         msg += "Select a problem:\n";
         msg += "  1.  DebrisDeorbit\n";
+        msg += "  2.  AveragedOrbitalElements\n";
 
         std::cout << msg << std::endl;
         std::cout << "Input desired problem (name or number): ";
-        std::cin >> prob;
+        //std::cin >> prob;
+        prob = "2";
     }
 
     // Create driver if valid problem was specified
@@ -99,6 +121,9 @@ int main(int argc, char *argv[])
             driver->SetInputFile("./../data/csalt/ddo_input.txt");
         else
             driver->SetInputFile(inFile);
+    }
+    else if (prob == "2" || prob == "AveragedOrbitalElements") {
+        driver = new AveragedOrbitalElementsDriver();
     }
     else {
         std::cout << "Error: Invalid problem specified.\n";
