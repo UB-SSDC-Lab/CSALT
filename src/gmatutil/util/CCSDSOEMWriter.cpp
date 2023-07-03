@@ -232,7 +232,7 @@ bool CCSDSOEMWriter::WriteDataSegment()
                      if (row < col)
                         continue;
 
-                     sprintf(strBuff1, "% 1.15e\0", outState[idx]);
+                     sprintf(strBuff1, "% 1.15e%c", outState[idx], '\0');
                      ++idx;
                      ss << strBuff1;
                      if (row == col)

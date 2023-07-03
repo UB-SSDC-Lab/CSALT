@@ -16,7 +16,7 @@ SET(CSALT_APP_DIRS
 )
 
 SET(CSALT_APP_SRCS
-    src/CSALTApplication.cpp
+    src/csaltApplication.cpp
     src/ConsoleMessageReceiver.cpp
     src/drivers/CsaltDriver.cpp
     src/drivers/DebrisDeorbitDriver.cpp
