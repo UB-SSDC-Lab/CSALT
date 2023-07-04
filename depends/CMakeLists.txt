@@ -17,3 +17,4 @@ SET(GMAT_DEP_BUILD_DIR "${CMAKE_CURRENT_SOURCE_DIR}/build")
 ###############################################################################
 
 INCLUDE(CMakeModules/GmatBoostConfig.cmake)
+INCLUDE(CMakeModules/CsaltJlunaConfig.cmake)

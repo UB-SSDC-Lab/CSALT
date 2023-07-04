@@ -41,8 +41,7 @@ ENDIF()
 MESSAGE(STATUS "Downloading Boost ${Boost_VERSION} ...")
 SET(BOOST_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/Boost_${Boost_SUFFIX})
 FetchContent_Populate(boost
-  # Use .tar.bz2 because .7z doesn't seem to extract properly (as of Boost 1.71.0)
-  URL https://boostorg.jfrog.io/artifactory/main/release/${Boost_VERSION}/source/boost_${Boost_SUFFIX}.tar.bz2
+  URL https://boostorg.jfrog.io/artifactory/main/release/${Boost_VERSION}/source/boost_${Boost_SUFFIX}.7z
   SOURCE_DIR ${BOOST_ROOT}
   BINARY_DIR ${GMAT_DEP_BUILD_DIR}/boost
   SUBBUILD_DIR ${GMAT_DEP_BUILD_DIR}/boost-subbuild
