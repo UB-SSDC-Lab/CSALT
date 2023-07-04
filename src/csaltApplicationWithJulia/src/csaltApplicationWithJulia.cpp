@@ -1,23 +1,30 @@
 
 #include "csaltApplicationWithJulia.hpp"
 
+using namespace jluna;
+
 int main(int argc, char *argv[])
 {
+    initialize();
+    Base["println"]("hello julia");
+
+    // START OF OLD CODE PRIOR TO USING JLUNA
     // Setup Julia
-    setup_julia();
+    //setup_julia();
 
     // Run CSALT with julia
-    try {
-        int ret = unsafe_main(argc, argv);
-        return ret;
-    }
-    catch(const LowThrustException& e)
-    {
-        // Stop Julia 
-        stop_julia(1);
-        throw e;
-        return 1; // Don't thing return is necessary when throwing exception
-    } 
+    //try {
+    //    int ret = unsafe_main(argc, argv);
+    //    return ret;
+    //}
+    //catch(const LowThrustException& e)
+    //{
+    //    // Stop Julia 
+    //    stop_julia(1);
+    //    throw e;
+    //    return 1; // Don't thing return is necessary when throwing exception
+    //} 
+    return 0;
 }
 
 int unsafe_main(int argc, char *argv[])

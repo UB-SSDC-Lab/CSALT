@@ -34,9 +34,9 @@ SET(GMAT_RELEASE_NAME "R2022a" CACHE STRING "GMAT version name")
 SET(GMAT_VERSION ${GMAT_RELEASE_NAME})
 SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS ON)
 
-# Enforce C++ Standard. C++17 is preferred.
-SET(CMAKE_CXX_STANDARD 17 CACHE STRING "C++ Standard used for the build. C++17 is preferred")
-SET_PROPERTY(CACHE CMAKE_CXX_STANDARD PROPERTY STRINGS 17 14 11)
+# Enforce C++ Standard. C++20 is preferred.
+SET(CMAKE_CXX_STANDARD 20 CACHE STRING "C++ Standard used for the build. C++20 is preferred")
+SET_PROPERTY(CACHE CMAKE_CXX_STANDARD PROPERTY STRINGS 20 17 14)
 SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 SET(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -51,16 +51,6 @@ else()
   SET(GMAT_64_BIT OFF)
   MESSAGE(STATUS "*** Creating 32-bit GMAT Build System. Please ensure that 32-bit versions of all dependencies are available. ***")
 endif()
-
-# Default to Release configuration on single-config generators
-# e.g. make, but not VisualStudio or XCode
-# Note that CMAKE_BUILD_TYPE is initialized to "" on the initial cmake-gui
-# run, so we check for that and set the default appropriately
-#if(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
-#  SET(CMAKE_BUILD_TYPE Release CACHE STRING "Build Configuration (Release, Debug, RelWithDebInfo, or MinSizeRel" FORCE)
-#else()
-#  SET(CMAKE_BUILD_TYPE Debug CACHE STRING "Build Configuration (Release, Debug, RelWithDebInfo, or MinSizeRel" FORCE)
-#endif()
 
 # Set default GMAT installation location
 # Can be overridden by using "-DCMAKE_INSTALL_PREFIX=/foo/bar" at command line
