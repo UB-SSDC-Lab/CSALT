@@ -40,13 +40,15 @@ ENDIF()
 # Download Boost
 MESSAGE(STATUS "Downloading Boost ${Boost_VERSION} ...")
 SET(BOOST_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/Boost_${Boost_SUFFIX})
-FetchContent_Populate(boost
-  URL https://boostorg.jfrog.io/artifactory/main/release/${Boost_VERSION}/source/boost_${Boost_SUFFIX}.7z
-  SOURCE_DIR ${BOOST_ROOT}
-  BINARY_DIR ${GMAT_DEP_BUILD_DIR}/boost
-  SUBBUILD_DIR ${GMAT_DEP_BUILD_DIR}/boost-subbuild
-  ${QUIET}
-)
+IF (NOT EXISTS ${BOOST_ROOT})
+  FetchContent_Populate(boost
+    URL https://boostorg.jfrog.io/artifactory/main/release/${Boost_VERSION}/source/boost_${Boost_SUFFIX}.7z
+    SOURCE_DIR ${BOOST_ROOT}
+    BINARY_DIR ${GMAT_DEP_BUILD_DIR}/boost
+    SUBBUILD_DIR ${GMAT_DEP_BUILD_DIR}/boost-subbuild
+    ${QUIET}
+  )
+ENDIF()
 
 ###############################################################################
 # Load Boost
