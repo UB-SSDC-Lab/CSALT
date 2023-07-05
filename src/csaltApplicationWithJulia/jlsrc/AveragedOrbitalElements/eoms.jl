@@ -1,17 +1,6 @@
 
-# Helper function for geting quadrature weights
-function fill_gausslegendre!(τs,ws,n)
-    τso, wso = gausslegendre(n)
-    τs .= τso
-    ws .= wso
-    return nothing
-end
-
 # Averaged equations of motion with the reduced averaged state vector (no true longitude) 
-function averaged_reduced_state_dynamics!(dx, x, t, δ, α1, α2, α3, μ, tMax, Isp, g0, τs, ws)
-    # Grab states
-    p,f,g,h,k,m = x
-    display(x)
+function averaged_reduced_state_dynamics(p, f, g, h, k, m, t, δ, α1, α2, α3, μ, tMax, Isp, g0, τs, ws)
     # Put thrust directions in SVector
     α = SVector(α1,α2,α3)
 
@@ -55,17 +44,32 @@ function averaged_reduced_state_dynamics!(dx, x, t, δ, α1, α2, α3, μ, tMax,
     dmdt = -tMax*δ / (Isp * g0)
 
     # Set averaged dynamics
-    dx[1] = pin
-    dx[2] = fin 
-    dx[3] = gin 
-    dx[4] = hin
-    dx[5] = kin 
-    dx[6] = dmdt
-    return nothing
+    return (pin, fin, gin, hin, kin, dmdt)
 end
 
-# averaged_reduced_state_dynamics_ptr() = @cfunction(averaged_reduced_state_dynamics,
-#             Tuple{Float64,Float64,Float64,Float64,Float64,Float64},
-#            (Float64,Float64,Float64,Float64,Float64,Float64,
-#             Float64,Float64,Float64,Float64,Float64,Float64,
-#             Float64,Float64,Float64)
+# MEE element set dynamics including only central body point mass force model
+function mee_dynamics(x, t, δ, α, μ, tMax)
+    # Grab states
+    p,f,g,h,k,L,m = x
+
+    # Compute control
+    Δ       = (tMax / m)*δ*α
+
+    # Compute requirements
+    w       = 1.0 + f*cos(L) + g*sin(L)
+    ss      = 1.0 + h*h + k*k
+    κ       = h*sin(L) - k*cos(L)
+    sqrtpmu = sqrt(p / μ)
+    wInv    = 1.0 / w
+
+    # Compute dynamics
+    dpdt    = 2.0*p*wInv*sqrtpmu*Δ[2]
+    dfdt    = sqrtpmu*sin(L)*Δ[1] + sqrtpmu*wInv*((w+1.0)*cos(L) + f)*Δ[2] - sqrtpmu*g*wInv*κ*Δ[3]
+    dgdt    = -sqrtpmu*cos(L)*Δ[1] + sqrtpmu*wInv*((w+1.0)*sin(L) + g)*Δ[2] + sqrtpmu*f*wInv*κ*Δ[3]
+    dhdt    = 0.5*sqrtpmu*ss*cos(L)*wInv*Δ[3]
+    dkdt    = 0.5*sqrtpmu*ss*sin(L)*wInv*Δ[3]
+    dLdt    = sqrtpmu*wInv*κ*Δ[3] + sqrt(μ*p)*w*w/(p*p)
+
+    # Return dynamics
+    return SVector(dpdt, dfdt, dgdt, dhdt, dkdt, dLdt)
+end

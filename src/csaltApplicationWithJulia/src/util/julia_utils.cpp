@@ -1,6 +1,15 @@
 #include "julia_utils.hpp"
 
-// Function for initializing jluna
+using namespace jluna;
+
+// Function for initializing jluna and the CSALT Julia module
 void initialize_jluna() {
-    jluna::initialize();
-}
+    // Initialize jluna with --threads auto flag
+    //initialize(JULIA_NUM_THREADS_AUTO);
+
+    // Initialize jluna with single thread
+    initialize();
+
+    // Load CSALT/julia source code
+    Main.include(JLSRC_INCLUDE);
+};

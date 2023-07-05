@@ -4,4 +4,5 @@ using FastGaussQuadrature
 using StaticArrays
 
 # Include source
-add_src_file("averaged_orbital_elements", "eoms.jl")
+include(joinpath(@__DIR__, "quadrature.jl"))
+include(joinpath(@__DIR__, "eoms.jl"))

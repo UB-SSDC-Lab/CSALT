@@ -3,9 +3,12 @@
 #include "AveragedOrbitalElementsPathObject.hpp"
 #include "AveragedOrbitalElementsPointObject.hpp"
 
+using namespace jluna;
+
 AveragedOrbitalElementsDriver::AveragedOrbitalElementsDriver() : 
     CsaltDriver("AveragedOrbitalElements")
 {
+    // Set problem parameters
     SetParameters();
 }
 
@@ -22,6 +25,9 @@ AveragedOrbitalElementsDriver::~AveragedOrbitalElementsDriver()
 
 void AveragedOrbitalElementsDriver::SetParameters()
 {
+    // Set file paths
+    controlHistoryFile = "./../data/csalt/aao_sol.och";
+
     // Define problem parameters
     LU      = 6378.0;
     mu      = 3.986e5;
@@ -34,7 +40,7 @@ void AveragedOrbitalElementsDriver::SetParameters()
     tMax    = 2.0*eta*P / (g0 * Isp);
 
     // Set number of points use in Gauss quadrature
-    n       = 100;
+    n       = 10;
 
     // Set initial state vector constraint
     x0_con.SetSize(6);
@@ -48,9 +54,9 @@ void AveragedOrbitalElementsDriver::SetParameters()
     // Set final state vector constraint
     xf_con.SetSize(5);
     xf_con[0] = 42165.0 / LU;
-    xf_con[1] = 0.0;
+    xf_con[1] = 0.01;
     xf_con[2] = 0.0;
-    xf_con[3] = 0.0;
+    xf_con[3] = 8.726646282124052e-5;
     xf_con[4] = 0.0;
 
     // Scale variables
@@ -63,10 +69,11 @@ void AveragedOrbitalElementsDriver::SetParameters()
 void AveragedOrbitalElementsDriver::SetPointPathAndProperties()
 {
     // Instantiate point and path objects
-    pathObject  = new AveragedOrbitalElementsPathObject(n);
+    pathObject  = new AveragedOrbitalElementsPathObject();
     pointObject = new AveragedOrbitalElementsPointObject();
 
     // Set path object properties
+    dynamic_cast<AveragedOrbitalElementsPathObject*>(pathObject)->SetGaussQuadrature(n);
     dynamic_cast<AveragedOrbitalElementsPathObject*>(pathObject)->SetGravitationalParameter(mu);
     dynamic_cast<AveragedOrbitalElementsPathObject*>(pathObject)->SetThrustParameters(tMax, Isp, g0);
 
@@ -92,15 +99,23 @@ void AveragedOrbitalElementsDriver::SetupPhases()
     RadauPhase *phase   = new RadauPhase();
 
     // Set guess mode 
-    std::string initialGuessMode    = "LinearNoControl";
+    std::string initialGuessMode    = "LinearUnityControl";
 
     // Set bounds
     Rvector state_LB(6);
     Rvector state_UB(6);
-    for (Integer i = 0; i < 6; i++) {
-        state_LB(i) = -INF;
-        state_UB(i) = INF;
-    }
+    state_LB(0) = 10000.0 / LU;
+    state_UB(0) = 60000.0 / LU;
+    state_LB(1) = -0.1;
+    state_UB(1) =  0.8;
+    state_LB(2) = -0.1;
+    state_UB(2) =  0.1;
+    state_LB(3) = -10.0;
+    state_UB(3) =  10.0;
+    state_LB(4) = -10.0;
+    state_UB(4) =  10.0;
+    state_LB(5) = 0.9 * m0;
+    state_UB(5) = m0;
 
     Rvector control_LB(4);
     Rvector control_UB(4);

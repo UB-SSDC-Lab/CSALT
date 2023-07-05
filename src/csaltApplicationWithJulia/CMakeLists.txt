@@ -38,6 +38,13 @@ SET(CSALT_APP_JL_SRCS
 )
 
 # ====================================================================
+# Add preprocessor macro for providing Julia code for including 
+# Julia source code
+SET(JLSRC_INCLUDE_TEMP "${CMAKE_CURRENT_SOURCE_DIR}/jlsrc/include.jl" CACHE FILEPATH "File path to Julia source code include script.")
+FILE(TO_CMAKE_PATH "${JLSRC_INCLUDE_TEMP}" JLSRC_INCLUDE)
+ADD_DEFINITIONS(-DJLSRC_INCLUDE="${JLSRC_INCLUDE}")
+
+# ====================================================================
 # Recursively find all include files, which will be added to IDE-based
 # projects (VS, XCode, etc.)
 FILE(GLOB_RECURSE CSALT_APP_JL_HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.hpp)

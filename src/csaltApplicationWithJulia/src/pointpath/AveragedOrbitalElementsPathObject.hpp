@@ -3,22 +3,31 @@
 #define AVERAGED_ORBITAL_ELEMENTS_PATH_OBJECT_HPP
 
 #include "UserPathFunction.hpp"
+#include "csalt.hpp"
 #include "julia_utils.hpp" 
+
+using namespace jluna;
 
 class AveragedOrbitalElementsPathObject : public UserPathFunction 
 {
 public:
     // Default constructor
-    AveragedOrbitalElementsPathObject(Integer n);
+    AveragedOrbitalElementsPathObject();
 
     // Destructor
     virtual ~AveragedOrbitalElementsPathObject();
+
+    // Initialize path function
+   virtual void Initialize(FunctionInputData *pd, PathFunctionContainer *pfc);
 
     // Set Gravitational parameter
     void SetGravitationalParameter(Real muarg);
 
     // Set thrust parameters
     void SetThrustParameters(Real tMaxarg, Real Isparg, Real g0arg);
+
+    // Set gauss quadrature
+    void SetGaussQuadrature(Integer narg);
 
     // Evaluate functions
     void EvaluateFunctions();
@@ -34,14 +43,10 @@ protected:
     Real Isp;
     Real g0;
 
-    // State and derivative Julia vectors
-    //JLvector x;
-    //JLvector dx;
-
     // Gauss quadrature weights and notes
     Integer n;
-    //JLvector taus;
-    //JLvector ws;
+    Vector<Float64> taus;
+    Vector<Float64> ws;
 };
 
 #endif

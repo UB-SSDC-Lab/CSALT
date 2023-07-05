@@ -1,6 +1,13 @@
 
 #include "csaltApplicationWithJulia.hpp"
 
+// int main(int argc, char *argv[])
+// {
+//     initialize_jluna();
+
+//     return 0;
+// }
+
 int main(int argc, char *argv[])
 {
     // Initialize jluna
@@ -90,7 +97,7 @@ int main(int argc, char *argv[])
         std::cout << msg << std::endl;
         std::cout << "Input desired problem (name or number): ";
         //std::cin >> prob;
-        prob = "1";
+        prob = "2";
     }
 
     // Create driver if valid problem was specified
