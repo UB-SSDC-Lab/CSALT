@@ -1,18 +1,11 @@
 
 #include "csaltApplicationWithJulia.hpp"
 
-using namespace jluna;
-
 int main(int argc, char *argv[])
 {
-    initialize();
-    Base["println"]("hello julia");
+    // Initialize jluna
+    initialize_jluna();
 
-    return 0;
-}
-
-int unsafe_main(int argc, char *argv[])
-{
     // Instantiate some requirements
     std::string msg;
     std::string prob;
@@ -97,7 +90,7 @@ int unsafe_main(int argc, char *argv[])
         std::cout << msg << std::endl;
         std::cout << "Input desired problem (name or number): ";
         //std::cin >> prob;
-        prob = "2";
+        prob = "1";
     }
 
     // Create driver if valid problem was specified
