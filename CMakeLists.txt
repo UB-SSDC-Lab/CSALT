@@ -143,6 +143,9 @@ endif()
 # Setup CMake-managed dependencies
 ADD_SUBDIRECTORY(depends)
 
+# Append to CMAKE_MODULE_PATH to include FineJulia.cmake module
+LIST(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/depends/CMakeModules")
+
 # ====================================================================
 # ------------------------------------------------------------------ #
 # CSALT Dependencies: Only required if building the CSALT subsystem  #

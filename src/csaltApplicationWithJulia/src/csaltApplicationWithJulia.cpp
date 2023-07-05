@@ -8,30 +8,11 @@ int main(int argc, char *argv[])
     initialize();
     Base["println"]("hello julia");
 
-    // START OF OLD CODE PRIOR TO USING JLUNA
-    // Setup Julia
-    //setup_julia();
-
-    // Run CSALT with julia
-    //try {
-    //    int ret = unsafe_main(argc, argv);
-    //    return ret;
-    //}
-    //catch(const LowThrustException& e)
-    //{
-    //    // Stop Julia 
-    //    stop_julia(1);
-    //    throw e;
-    //    return 1; // Don't thing return is necessary when throwing exception
-    //} 
     return 0;
 }
 
 int unsafe_main(int argc, char *argv[])
 {
-    // Setup Julia
-    setup_julia();
-
     // Instantiate some requirements
     std::string msg;
     std::string prob;
@@ -140,6 +121,5 @@ int unsafe_main(int argc, char *argv[])
     // Run driver
     driver->Run();
 
-    stop_julia(0);
     return 0;
 }

@@ -5,20 +5,10 @@ MESSAGE("CSALT application with Julia" ${VERSION})
 SET(TargetName CSALTApplicationWithJulia)
 
 # Find julia
-LIST(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/depends/CMakeModules")
 FIND_PACKAGE(Julia 1.7.0 REQUIRED)
 
-# Define compiler definition for path to Julia src (TO BE REMOVED)
-SET(FILE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/jlsrc" CACHE FILEPATH "File path to Julia source files")
-FILE(TO_CMAKE_PATH "${FILE_PATH}" FILE_PATH_NORMALIZED)
-ADD_DEFINITIONS(-DJLSRC="${FILE_PATH_NORMALIZED}")
-
-# Find jluna (currently just setting file paths)
-FIND_LIBRARY(jluna REQUIRED 
-  NAMES jluna
-  PATHS "/data/home/granthec/Software/jluna/lib"
-)
-SET(jluna_INCLUDE_DIR "/data/home/granthec/Software/jluna/lib/include/jluna")
+# Find jluna
+FIND_PACKAGE(jluna 1.0 REQUIRED)
 
 # Add preprocessor definitions
 ADD_DEFINITIONS("-D_DYNAMICLINK")
@@ -69,9 +59,9 @@ TARGET_LINK_LIBRARIES(${TargetName} PRIVATE ${SNOPT_CPPLIBRARY})
 TARGET_LINK_LIBRARIES(${TargetName} PRIVATE ${SNOPT_LIBRARY})
 TARGET_LINK_LIBRARIES(${TargetName} PRIVATE CSALT)
 TARGET_LINK_LIBRARIES(${TargetName} PRIVATE GmatUtil)
+TARGET_LINK_LIBRARIES(${TargetName} PRIVATE ${jluna})
 TARGET_LINK_LIBRARIES(${TargetName} PRIVATE "$<BUILD_INTERFACE:Julia::Julia>")
 TARGET_LINK_LIBRARIES(${TargetName} PRIVATE "$<BUILD_INTERFACE:Threads::Threads>")
-TARGET_LINK_LIBRARIES(${TargetName} PRIVATE ${jluna})
 
 # Set building with C++ STD 20
 TARGET_COMPILE_FEATURES(${TargetName} PRIVATE cxx_std_20)

@@ -1,0 +1,3 @@
+[submodule "depends/jluna"]
+	path = depends/jluna
+	url = https://github.com/Clemapfel/jluna.git
