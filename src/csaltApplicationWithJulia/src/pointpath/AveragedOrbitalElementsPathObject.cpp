@@ -100,9 +100,9 @@ void AveragedOrbitalElementsPathObject::EvaluateFunctions()
     SetFunctions(DYNAMICS, dynamics);
 
     // Path constraints
-    Rvector pathCon(3);
-    Rvector pathConLB(3);
-    Rvector pathConUB(3);
+    Rvector pathCon(2);
+    Rvector pathConLB(2);
+    Rvector pathConUB(2);
 
     // Scale factor constraint
     pathCon(0)      = sf;
@@ -115,9 +115,9 @@ void AveragedOrbitalElementsPathObject::EvaluateFunctions()
     pathConUB(1)    = 1.0;
 
     // Eccentricity constraint (to avoid singularity in EOMs)
-    pathCon(2)      = sqrt(f*f + g*g);
-    pathConLB(2)    = 0.0;
-    pathConUB(2)    = 1.0;
+    //pathCon(2)      = sqrt(f*f + g*g);
+    //pathConLB(2)    = 0.0;
+    //pathConUB(2)    = 1.0;
 
     // Set path constraints
     SetFunctions(ALGEBRAIC, pathCon);

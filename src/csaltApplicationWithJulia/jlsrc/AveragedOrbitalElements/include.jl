@@ -2,6 +2,7 @@
 # Load dependencies
 using FastGaussQuadrature
 using StaticArrays
+using ForwardDiff
 
 # Include source
 include(joinpath(@__DIR__, "quadrature.jl"))

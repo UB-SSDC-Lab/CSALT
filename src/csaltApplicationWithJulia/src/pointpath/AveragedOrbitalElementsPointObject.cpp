@@ -83,13 +83,16 @@ void AveragedOrbitalElementsPointObject::EvaluateFunctions()
         algF_U[i + 7]   = 0.0;
     }
 
+    algF_L[8] = -1e10;
+    algF_U[8] =  1e10;
+
     // Set function and bounds
     SetFunctions(ALGEBRAIC, algF);
     SetFunctionBounds(ALGEBRAIC, LOWER, algF_L);
     SetFunctionBounds(ALGEBRAIC, UPPER, algF_U);
 
     // Set const function
-    Rvector costFunc(1, tf / 86400.0);
+    Rvector costFunc(1, tf);
     SetFunctions(COST, costFunc);
 }
 

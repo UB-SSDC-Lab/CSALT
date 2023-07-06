@@ -8,15 +8,15 @@ SET(jluna_ROOT        ${CMAKE_CURRENT_SOURCE_DIR}/jluna)
 SET(jluna_BUILD_DIR   ${GMAT_DEP_BUILD_DIR}/jluna)
 SET(jluna_INSTALL_DIR ${jluna_ROOT}/lib)
 
-# Make build directory
-FILE(MAKE_DIRECTORY ${jluna_BUILD_DIR})
-
 # If jluna root does not exist, initialize git submodule
-IF (NOT EXISTS ${jluna_ROOT})
+IF (NOT EXISTS "${jluna_ROOT}/.src")
   MESSAGE(STATUS "Downloading jluna ...")
   EXECUTE_PROCESS(COMMAND git submodule update --init -- ${CMAKE_CURRENT_SOURCE_DIR}/jluna
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 ENDIF()
+
+# Make build directory
+FILE(MAKE_DIRECTORY ${jluna_BUILD_DIR})
 
 # If jluna install directory dies not exist, build jluna 
 IF (NOT EXISTS ${jluna_INSTALL_DIR})
