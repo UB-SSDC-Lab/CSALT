@@ -11,6 +11,9 @@ public:
     DebrisDeorbitDriver(const std::string &testName, const Integer snoptConsoleOutputLevel);
     virtual ~DebrisDeorbitDriver();
 
+    // Process trajectory solution
+    virtual void ProcessSolution(Trajectory* traj);
+
 protected:
     virtual void SetParameters();
     virtual void ProcessInputFile();

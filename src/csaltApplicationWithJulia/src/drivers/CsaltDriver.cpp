@@ -165,6 +165,9 @@ Integer CsaltDriver::Run()
             if (writeControlHistory)
                 traj->WriteToFile(controlHistoryFile);
 
+            // Process solution
+            ProcessSolution(traj);
+
             if (verbosity != SILENT)
                 MessageInterface::ShowMessage("*** END %s PROBLEM ***\n", probName.c_str());
         }

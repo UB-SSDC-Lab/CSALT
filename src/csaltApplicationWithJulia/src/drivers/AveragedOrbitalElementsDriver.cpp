@@ -2,6 +2,9 @@
 #include "AveragedOrbitalElementsDriver.hpp"
 #include "AveragedOrbitalElementsPathObject.hpp"
 #include "AveragedOrbitalElementsPointObject.hpp"
+#include <string>
+
+//#define DEBUG_JULIA_DRIVER
 
 using namespace jluna;
 
@@ -23,6 +26,62 @@ AveragedOrbitalElementsDriver::~AveragedOrbitalElementsDriver()
 
 }
 
+void AveragedOrbitalElementsDriver::ProcessSolution(Trajectory* traj)
+{
+    // Get phase list
+    std::vector<Phase*> phaseList = traj->GetPhaseList();
+
+    // Get time vector and state/control arrays
+    Rvector timeVector  = phaseList[0]->GetTimeVector();
+    Rmatrix stateSol    = phaseList[0]->GetDecisionVector()->GetStateArray();
+    Rmatrix controlSol  = phaseList[0]->GetDecisionVector()->GetControlArray();
+
+    // Instantiate variabels for storing number of rows and cols
+    Integer r, c;
+
+    // Create string for constructing Julia code
+    std::string code;
+
+    // Create and fill Julia time vector
+    r = timeVector.GetSize();
+    code = "return zeros(" + std::to_string(r) + ")";
+    Vector<Float64> times = safe_eval(code.c_str());
+    for (size_t i = 0; i < r; i++)
+        times[i] = timeVector(i);
+
+    // Create and fill Julia state vector 
+    stateSol.GetSize(r, c);
+    code = "return zeros(" + std::to_string(r*c) + ")";
+    Vector<Float64> states_vec = safe_eval(code.c_str());
+
+    size_t idx = 0;
+    for (size_t row = 0; row < r; row++)
+        for (size_t col = 0; col < c; col++)
+            states_vec[idx++] = stateSol(row,col);
+
+#ifdef DEBUG_JULIA_DRIVER
+    std::cout << code << std::endl;
+    idx = 0;
+    for (size_t row = 0; row < r; row++)
+        for (size_t col = 0; col < c; col++)
+            std::cout << stateSol(row,col) - (double) states_vec[idx++] << std::endl;
+#endif
+
+    // Create and fill Julia control vector
+    controlSol.GetSize(r, c);
+    code = "return zeros(" + std::to_string(r*c) + ")";
+    Vector<Float64> controls_vec = safe_eval(code.c_str());
+
+    idx = 0;
+    for (size_t row = 0; row < r; row++)
+        for (size_t col = 0; col < c; col++)
+            controls_vec[idx++] = controlSol(row,col);
+
+    // Call Julia process solution function
+    auto proc_sol = Main["process_averaged_orbital_elements_solution"];
+    proc_sol(times, states_vec, controls_vec);
+}
+
 void AveragedOrbitalElementsDriver::SetParameters()
 {
     // Set file paths
@@ -38,9 +97,10 @@ void AveragedOrbitalElementsDriver::SetParameters()
     g0      = 9.80664;
     eta     = 0.55;
     tMax    = 2.0*eta*P / (g0 * Isp);
+    tMax    = 10.0;
 
     // Set number of points use in Gauss quadrature
-    n       = 3;
+    n       = 89;
 
     // Set initial state vector constraint
     x0_con.SetSize(6);
@@ -85,7 +145,7 @@ void AveragedOrbitalElementsDriver::SetPointPathAndProperties()
     maxMeshRefinementCount      = 20;
     majorIterationsLimits[0]    = 100;
     totalIterationsLimits[0]    = 300000;
-    optimizationMode            = StringArray(1, "Minimize");
+    optimizationMode            = StringArray(1, "Feasible point");
 
     majorOptimalityTolerances.SetSize(1);
     feasibilityTolerances.SetSize(1);
@@ -131,7 +191,7 @@ void AveragedOrbitalElementsDriver::SetupPhases()
 
     // Set mesh properties
     Integer N, M;
-    N = 5;
+    N = 10;
     M = 10;
     Real step = 2.0 / (N - 1.0);
     Rvector meshIntervalFractions(N);
@@ -167,6 +227,6 @@ void AveragedOrbitalElementsDriver::SetupPhases()
     phase->SetTimeLowerBound(0.0);
     phase->SetTimeUpperBound(time_UB);
     phase->SetTimeInitialGuess(0.0);
-    phase->SetTimeFinalGuess(200.0*86400.0/TU);
+    phase->SetTimeFinalGuess(10.0*86400.0/TU);
     phaseList.push_back(phase);
 }

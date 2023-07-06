@@ -16,6 +16,11 @@ DebrisDeorbitDriver::DebrisDeorbitDriver(const std::string &testName, const Inte
 
 DebrisDeorbitDriver::~DebrisDeorbitDriver() {}
 
+void DebrisDeorbitDriver::ProcessSolution(Trajectory* traj)
+{
+    // Do nothing
+}
+
 void DebrisDeorbitDriver::SetParameters()
 {
     // Set problem units

@@ -23,7 +23,12 @@ public:
         VERBOSE_DEBUG
     };
 
+    // Run CSALT optimization problem
     virtual Integer Run();
+
+    // Process solution (to be redefined by subclass)
+    virtual void ProcessSolution(Trajectory* traj) = 0;
+
 protected:
     // Required method that sets the path & point objects
     virtual void SetPointPathAndProperties() = 0;
