@@ -1,6 +1,17 @@
 
 # Averaged equations of motion with the reduced averaged state vector (no true longitude) 
-function averaged_reduced_state_dynamics(p, f, g, h, k, m, t, δ, α1, α2, α3, μ, tMax, Isp, g0, τs, ws)
+function averaged_reduced_state_dynamics(p, f, g, h, k, m, t, δ, α1, α2, α3, μ, tMax, Isp, g0, τs, ws, debug)
+    # Print states
+    if debug
+        println("nodes:")
+        display(τs)
+        println("weights:")
+        display(ws)
+        println("states:")
+        println(string(p) * " " * string(f) * " " * string(g) * " " *
+                string(h) * " " * string(k) * " " * string(m))
+    end
+
     # Put thrust directions in SVector
     α = SVector(α1,α2,α3)
 
@@ -9,8 +20,8 @@ function averaged_reduced_state_dynamics(p, f, g, h, k, m, t, δ, α1, α2, α3,
     T0  = 2.0*π*sqrt(a*a*a / μ)
 
     # Approximate the averaging integral with quadrature
-    L0  = -π
-    Lf  = π
+    L0  = -π + 1e-6
+    Lf  = π - 1e-6
     pin = 0.0
     fin = 0.0
     gin = 0.0
@@ -44,7 +55,8 @@ function averaged_reduced_state_dynamics(p, f, g, h, k, m, t, δ, α1, α2, α3,
     dmdt = -tMax*δ / (Isp * g0)
 
     # Set averaged dynamics
-    return (pin, fin, gin, hin, kin, dmdt)
+    out = [pin, fin, gin, hin, kin, dmdt]
+    return out
 end
 
 # MEE element set dynamics including only central body point mass force model

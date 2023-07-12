@@ -9,8 +9,8 @@ function averaged_reduced_state_dynamics_state_partial(
     dIdx    = zeros(5,6)
 
     # Approximate integral with quadrature
-    L0      = -π
-    Lf      =  π
+    L0      = -π + 1e-6
+    Lf      =  π - 1e-6
     ddxdx   = zeros(6,6)
     @inbounds for i in eachindex(τs)
         # Compute true longitude for current point in quadrature

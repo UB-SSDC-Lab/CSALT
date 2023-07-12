@@ -97,10 +97,9 @@ void AveragedOrbitalElementsDriver::SetParameters()
     g0      = 9.80664;
     eta     = 0.55;
     tMax    = 2.0*eta*P / (g0 * Isp);
-    tMax    = 10.0;
 
     // Set number of points use in Gauss quadrature
-    n       = 89;
+    n       = 10;
 
     // Set initial state vector constraint
     x0_con.SetSize(6);
@@ -145,7 +144,7 @@ void AveragedOrbitalElementsDriver::SetPointPathAndProperties()
     maxMeshRefinementCount      = 20;
     majorIterationsLimits[0]    = 100;
     totalIterationsLimits[0]    = 300000;
-    optimizationMode            = StringArray(1, "Feasible point");
+    optimizationMode            = StringArray(1, "Minimize");
 
     majorOptimalityTolerances.SetSize(1);
     feasibilityTolerances.SetSize(1);
@@ -192,7 +191,7 @@ void AveragedOrbitalElementsDriver::SetupPhases()
     // Set mesh properties
     Integer N, M;
     N = 10;
-    M = 10;
+    M = 3;
     Real step = 2.0 / (N - 1.0);
     Rvector meshIntervalFractions(N);
     IntegerArray meshIntervalNumPoints;
@@ -212,7 +211,8 @@ void AveragedOrbitalElementsDriver::SetupPhases()
     xf_guess(5) = 0.9*x0_guess(5);
 
     // Set phase properties
-    phase->SetRelativeErrorTol(1e-5);
+    phase->SetRelativeErrorTol(1e-6);
+    phase->SetMaxPolynomialDegreeIncrease(3);
     phase->SetInitialGuessMode(initialGuessMode);
     phase->SetNumStateVars(6);
     phase->SetNumControlVars(4);

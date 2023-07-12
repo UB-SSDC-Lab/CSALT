@@ -1,8 +1,12 @@
 
 #include "AveragedOrbitalElementsPathObject.hpp"
-#include <iostream>
 
 //#define DEBUG_JULIA_PATH_FUNCTION
+
+#ifdef DEBUG_JULIA_PATH_FUNCTION
+#include <iostream>
+#include <iomanip>
+#endif
 
 AveragedOrbitalElementsPathObject::AveragedOrbitalElementsPathObject() :
     n       (0),
@@ -83,8 +87,14 @@ void AveragedOrbitalElementsPathObject::EvaluateFunctions()
     // Get EOM function
     auto eoms   = Main["averaged_reduced_state_dynamics"];
 
+    // Handle Julia debugging on Julia side
+    bool debug  = false;
+#ifdef DEBUG_JULIA_PATH_FUNCTION
+    debug = true;
+#endif
+
     // Call function
-    auto dx = eoms(p,f,g,h,k,m,t,sf,a1,a2,a3,mu,tMax,Isp,g0,taus,ws);
+    auto dx = eoms(p,f,g,h,k,m,t,sf,a1,a2,a3,mu,tMax,Isp,g0,taus,ws,debug);
 
     // Set dynamics 
     Rvector dynamics(6);
@@ -92,17 +102,20 @@ void AveragedOrbitalElementsPathObject::EvaluateFunctions()
         dynamics(i) = dx[i];
 
 #ifdef DEBUG_JULIA_PATH_FUNCTION
-    std::cout << "DEBUG: Julia dynamics." << std::endl;
     for (Integer i = 0; i < 6; i++)
-        std::cout << dynamics(i) << " " << (double) dx[i] << std::endl; 
+        std::cout << std::setprecision(16) << states(i) << " ";
+    std::cout << std::endl;
+    for (Integer i = 0; i < 6; i++)
+        std::cout << std::setprecision(16) << (Float64) dx[i] << 
+            " " << std::setprecision(16) << dynamics(i) << std::endl; 
 #endif
 
     SetFunctions(DYNAMICS, dynamics);
 
     // Path constraints
-    Rvector pathCon(2);
-    Rvector pathConLB(2);
-    Rvector pathConUB(2);
+    Rvector pathCon(3);
+    Rvector pathConLB(3);
+    Rvector pathConUB(3);
 
     // Scale factor constraint
     pathCon(0)      = sf;
@@ -113,6 +126,11 @@ void AveragedOrbitalElementsPathObject::EvaluateFunctions()
     pathCon(1)      = GmatMathUtil::Sqrt(a1*a1 + a2*a2 + a3*a3);
     pathConLB(1)    = 1.0;
     pathConUB(1)    = 1.0;
+
+    // Eccentricity constraint
+    pathCon(2)      = GmatMathUtil::Sqrt(f*f + g*g);
+    pathConLB(2)    = 1e-8;
+    pathConUB(2)    = 1.0 - 1e-8;
 
     // Set path constraints
     SetFunctions(ALGEBRAIC, pathCon);
@@ -181,15 +199,17 @@ void AveragedOrbitalElementsPathObject::EvaluateJacobians()
     // ===== Algebraic Partials
 
     // Allocate matricies for algebraic Jacobians
-    Rmatrix algStateJac(2,6), algControlJac(2,4), algTimeJac(2,1);
+    Rmatrix algStateJac(3,6), algControlJac(3,4), algTimeJac(3,1);
 
     // Fill state Jacobian
     for (Integer col = 0; col < 6; col++)
-        for (Integer row = 0; row < 2; row++)
+        for (Integer row = 0; row < 3; row++)
             algStateJac(row,col) = 0.0;
+    algStateJac(2, 1) = f / GmatMathUtil::Sqrt(f*f + g*g);
+    algStateJac(2, 2) = g / GmatMathUtil::Sqrt(f*f + g*g);
 
     // Fill time Jacobian
-    for (Integer row = 0; row < 2; row++)
+    for (Integer row = 0; row < 3; row++)
         algTimeJac(row,0) = 0.0;
 
     // Fill control Jacobian
@@ -202,6 +222,8 @@ void AveragedOrbitalElementsPathObject::EvaluateJacobians()
     algControlJac(1,1)  = a1 * invLen; 
     algControlJac(1,2)  = a2 * invLen;
     algControlJac(1,3)  = a3 * invLen;
+    for (Integer col = 0; col < 4; col++)
+        algControlJac(2,col) = 0.0;
 
     // Set Jacobians
     SetJacobian(ALGEBRAIC, STATE,   algStateJac);

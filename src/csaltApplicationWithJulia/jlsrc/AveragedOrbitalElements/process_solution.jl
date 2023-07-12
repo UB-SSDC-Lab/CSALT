@@ -10,8 +10,8 @@ function process_averaged_orbital_elements_solution(times, states_vec, controls_
     
     # States
     idx = 1
-    for col in axes(states, 2)
-        for row in axes(states, 1)
+    for row in axes(states, 1)
+        for col in axes(states, 2)
             states[row,col] = states_vec[idx]
             idx += 1
         end
@@ -19,8 +19,8 @@ function process_averaged_orbital_elements_solution(times, states_vec, controls_
 
     # Controls
     idx = 1
-    for col in axes(controls, 2)
-        for row in axes(controls, 1)
+    for row in axes(controls, 1)
+        for col in axes(controls, 2)
             controls[row,col] = controls_vec[idx]
             idx += 1
         end
@@ -56,7 +56,7 @@ end
 
 function plot_states(dir, times, states)
     # Create figure for states
-    fig, axs = subplots(6; sharex = true)
+    fig, axs = subplots(6; sharex = true, figsize = (8.5, 11.0))
     fig.suptitle("Averaged Orbital Element States")
 
     # Plot states
